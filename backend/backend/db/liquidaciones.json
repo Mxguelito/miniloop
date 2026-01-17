@@ -1,0 +1,113 @@
+[
+  {
+    "id": "IWimfBg7DGNlL9sEVz93",
+    "mes": "Noviembre",
+    "anio": 2025,
+    "consorcioId": 1,
+    "propietarios": [
+      {
+        "id": 1762789753136,
+        "nombre": "victor",
+        "piso": "2",
+        "departamento": "c",
+        "expensaMes": 15000,
+        "expensaAdeudada": 2000,
+        "montoAbonado": 13000
+      }
+    ],
+    "movimientos": [
+      {
+        "id": 1762789760178,
+        "tipo": "ingreso",
+        "motivo": "alquiler",
+        "monto": 50000
+      },
+      {
+        "id": 1762834775549,
+        "tipo": "gasto",
+        "motivo": "reja ",
+        "monto": 10000
+      }
+    ],
+    "totales": {
+      "ingresos": 63000,
+      "ingresosExpensas": 13000,
+      "ingresosExtra": 50000,
+      "adeudado": 2000,
+      "gastos": 10000,
+      "saldoMes": 53000
+    },
+    "estado": "Cerrada",
+    "creadoEn": "2025-11-10T15:49:08.256Z"
+  },
+  {
+    "id": "OO-1hnVHhRGIeErR34GUY",
+    "mes": "Diciembre",
+    "anio": 2025,
+    "consorcioId": 1,
+    "propietarios": [
+      {
+        "id": 1762926495305,
+        "nombre": "juan",
+        "piso": "1",
+        "departamento": "c",
+        "expensaMes": 15000,
+        "expensaAdeudada": 5000,
+        "montoAbonado": 10000
+      }
+    ],
+    "movimientos": [
+      {
+        "id": 1762926479800,
+        "tipo": "ingreso",
+        "motivo": "alquiler ",
+        "monto": 50000
+      }
+    ],
+    "totales": {
+      "ingresos": 60000,
+      "ingresosExpensas": 10000,
+      "ingresosExtra": 50000,
+      "adeudado": 5000,
+      "gastos": 0,
+      "saldoMes": 60000
+    },
+    "estado": "Borrador",
+    "creadoEn": "2025-11-12T05:47:58.154Z"
+  },
+  {
+    "id": "nvUsCKTY1F1Qg8UlzxWLH",
+    "mes": "Enero",
+    "anio": "2026",
+    "consorcioId": 1,
+    "propietarios": [
+      {
+        "id": 1763044410198,
+        "nombre": "victor",
+        "piso": "2",
+        "departamento": "c",
+        "expensaMes": 15000,
+        "expensaAdeudada": 0,
+        "montoAbonado": 15000
+      }
+    ],
+    "movimientos": [
+      {
+        "id": 1763044401320,
+        "tipo": "ingreso",
+        "motivo": "alquiler",
+        "monto": 10000
+      }
+    ],
+    "totales": {
+      "ingresos": 25000,
+      "ingresosExpensas": 15000,
+      "ingresosExtra": 10000,
+      "adeudado": 0,
+      "gastos": 0,
+      "saldoMes": 25000
+    },
+    "estado": "Borrador",
+    "creadoEn": "2025-11-13T14:33:17.978Z"
+  }
+]
