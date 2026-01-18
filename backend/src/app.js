@@ -22,34 +22,33 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-
 // Middlewares
 const allowedOrigins = [
   "http://localhost:5173",
   process.env.FRONTEND_URL,
 ];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // permite Postman/Thunder Client (no mandan origin)
-      if (!origin) return callback(null, true);
+const corsOptions = {
+  origin: (origin, callback) => {
+    // permite Postman/Thunder Client (no mandan origin)
+    if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
 
-      return callback(new Error("CORS bloqueado: " + origin));
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+    return callback(new Error("CORS bloqueado: " + origin));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
 
+app.use(cors(corsOptions));
 
-// habilita preflight para TODOS
-app.options("*", cors());
+// ✅ habilita preflight usando LA MISMA config
+app.options("*", cors(corsOptions));
+
 
 app.use(express.json());
 app.use(morgan("dev"));
