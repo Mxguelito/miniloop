@@ -1,24 +1,15 @@
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL; // ej: https://miniloop.onrender.com
+
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: `${API_URL}/api`,
+  headers: { "Content-Type": "application/json" },
 });
-
-
-//  Interceptor de TOKEN
 
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  console.log("🚀 axiosInstance cargado");
-
-
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
