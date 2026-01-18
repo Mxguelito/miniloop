@@ -26,8 +26,9 @@ const __dirname = path.dirname(__filename);
 // Middlewares
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.FRONTEND_URL,
+  "https://miniloop-front.onrender.com",
 ];
+
 
 app.use(
   cors({
