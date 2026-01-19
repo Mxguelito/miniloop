@@ -25,17 +25,19 @@ const __dirname = path.dirname(__filename);
 // Middlewares
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.FRONTEND_URL,
+  "https://miniloop-front.onrender.com",
 ];
+
+// agrega FRONTEND_URL si existe (y le saca / final)
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL.replace(/\/$/, ""));
+}
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // permite Postman/Thunder Client (no mandan origin)
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+    if (allowedOrigins.includes(origin)) return callback(null, true);
 
     return callback(new Error("CORS bloqueado: " + origin));
   },
@@ -44,10 +46,14 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-app.use(cors(corsOptions));
+app.use((req, _res, next) => {
+  if (req.headers.origin) console.log("🌐 Origin:", req.headers.origin);
+  next();
+});
 
-// ✅ habilita preflight usando LA MISMA config
+app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
+
 
 
 app.use(express.json());
