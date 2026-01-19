@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/ui/Button";
-
+import { Link } from "react-router-dom";
+ 
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -95,9 +96,10 @@ export default function LoginPage() {
 
         <p className="mt-3 text-sm text-center text-gray-300">
           ¿No tenés cuenta?{" "}
-          <a href="/register" className="text-blue-400 hover:underline">
-            Crear cuenta
-          </a>
+          <Link to="/register" className="text-blue-400 hover:underline">
+  Crear cuenta
+</Link>
+
         </p>
       </form>
     </div>
