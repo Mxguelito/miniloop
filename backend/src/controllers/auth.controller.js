@@ -108,10 +108,15 @@ if (user.role !== "ADMIN" && user.estado !== "active") {
       }
     });
 
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Error iniciando sesión." });
-  }
+ } catch (err) {
+  console.error("❌ ERROR LOGIN:", err.message);
+  console.error(err.stack);
+  res.status(500).json({
+    message: "Error iniciando sesión",
+    error: err.message
+  });
+}
+
 }
 
 export async function getAllUsers(req, res) {
