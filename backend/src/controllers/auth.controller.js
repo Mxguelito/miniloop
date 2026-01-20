@@ -71,9 +71,10 @@ export async function login(req, res) {
 
   try {
     const result = await pool.query(
-      "SELECT * FROM usuarios WHERE email = $1",
-      [email]
-    );
+  "SELECT * FROM public.usuarios WHERE email = $1",
+  [email]
+);
+
 
     if (result.rowCount === 0) {
       return res.status(400).json({ message: "Usuario no encontrado." });
