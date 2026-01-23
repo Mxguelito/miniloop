@@ -6,18 +6,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const pool = new Pool({
-  host: process.env.PGHOST,
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  database: process.env.PGDATABASE,
-  port: process.env.PGPORT,
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false,
   },
-  options: "-c search_path=public",
 });
 
 pool
   .connect()
-  .then(() => console.log("🟢 Conectado a PostgreSQL (Miniloop)"))
+  .then(() => console.log("🟢 Conectado a PostgreSQL (Render)"))
   .catch(err => console.error("🔴 Error al conectar a PostgreSQL:", err));
