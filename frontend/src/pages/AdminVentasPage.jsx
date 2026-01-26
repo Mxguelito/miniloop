@@ -22,7 +22,9 @@ function Badge({ s }) {
     CANCELLED: "bg-red-500/15 border-red-400/20 text-red-200",
   };
   return (
-    <span className={`text-xs px-2 py-1 rounded-full border ${map[s] || "bg-white/10 border-white/10"}`}>
+    <span
+      className={`text-xs px-2 py-1 rounded-full border ${map[s] || "bg-white/10 border-white/10"}`}
+    >
       {s}
     </span>
   );
@@ -53,7 +55,9 @@ export default function AdminVentasPage() {
       if (from) params.set("from", from);
       if (to) params.set("to", to);
 
-      const res = await axiosInstance.get(`/kiosco/orders?${params.toString()}`);
+      const res = await axiosInstance.get(
+        `/kiosco/orders?${params.toString()}`,
+      );
       setOrders(res.data);
     } catch (e) {
       console.error(e);
@@ -80,7 +84,9 @@ export default function AdminVentasPage() {
   async function changeStatus(newStatus) {
     if (!selectedId) return;
     try {
-      await axiosInstance.patch(`/kiosco/orders/${selectedId}/status`, { status: newStatus });
+      await axiosInstance.patch(`/kiosco/orders/${selectedId}/status`, {
+        status: newStatus,
+      });
       await loadDetail(selectedId);
       await loadOrders();
     } catch (e) {
@@ -90,13 +96,12 @@ export default function AdminVentasPage() {
   }
 
   useEffect(() => {
-  loadOrders();
-}, []);
-
+    loadOrders();
+  }, []);
 
   const totalVendido = useMemo(
     () => orders.reduce((acc, o) => acc + Number(o.total || 0), 0),
-    [orders]
+    [orders],
   );
 
   const count = orders.length;
@@ -119,7 +124,9 @@ export default function AdminVentasPage() {
             </div>
             <div className="px-4 py-3 rounded-2xl bg-white/5 border border-white/10">
               <p className="text-xs text-gray-400">Total (filtro)</p>
-              <p className="text-2xl font-extrabold">{formatARS(totalVendido)}</p>
+              <p className="text-2xl font-extrabold">
+                {formatARS(totalVendido)}
+              </p>
             </div>
           </div>
         </div>
@@ -136,7 +143,9 @@ export default function AdminVentasPage() {
               >
                 <option value="">Todos</option>
                 {STATUS.map((s) => (
-                  <option key={s} value={s}>{s}</option>
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
                 ))}
               </select>
             </div>
@@ -192,7 +201,10 @@ export default function AdminVentasPage() {
               <h2 className="text-xl font-bold">Pedidos</h2>
               <button
                 onClick={() => {
-                  setStatus(""); setUserId(""); setFrom(""); setTo("");
+                  setStatus("");
+                  setUserId("");
+                  setFrom("");
+                  setTo("");
                   setTimeout(loadOrders, 0);
                 }}
                 className="text-sm px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15 transition"
@@ -218,15 +230,23 @@ export default function AdminVentasPage() {
                 </thead>
                 <tbody className="text-gray-200">
                   {orders.map((o) => (
-                    <tr key={o.id} className="border-b border-white/5 hover:bg-white/5 transition">
+                    <tr
+                      key={o.id}
+                      className="border-b border-white/5 hover:bg-white/5 transition"
+                    >
                       <td className="py-2 pr-2 font-semibold">#{o.id}</td>
                       <td className="py-2 pr-2">{o.user_id}</td>
-                      <td className="py-2 pr-2"><Badge s={o.status} /></td>
-                      <td className="py-2 pr-2 font-semibold">  {o.items_count ?? "—"}</td>
+                      <td className="py-2 pr-2">
+                        <Badge s={o.status} />
+                      </td>
+                      <td className="py-2 pr-2 font-semibold">
+                        {" "}
+                        {o.items_count ?? "—"}
+                      </td>
 
-                      
-
-                      <td className="py-2 pr-2 font-semibold">{formatARS(o.total)}</td>
+                      <td className="py-2 pr-2 font-semibold">
+                        {formatARS(o.total)}
+                      </td>
                       <td className="py-2 pr-2">
                         {new Date(o.created_at).toLocaleString("es-AR")}
                       </td>
@@ -272,14 +292,23 @@ export default function AdminVentasPage() {
                     <Badge s={detail.order.status} />
                   </div>
                   <p className="text-xs text-gray-400 mt-2">
-                    User: <span className="text-gray-200 font-semibold">{detail.order.user_id}</span>
+                    User:{" "}
+                    <span className="text-gray-200 font-semibold">
+                      {detail.order.user_id}
+                    </span>
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    Total: <span className="text-gray-200 font-semibold">{formatARS(detail.order.total)}</span>
+                    Total:{" "}
+                    <span className="text-gray-200 font-semibold">
+                      {formatARS(detail.order.total)}
+                    </span>
                   </p>
                   {detail.order.notes && (
                     <p className="text-xs text-gray-400 mt-1">
-                      Notas: <span className="text-gray-200">{detail.order.notes}</span>
+                      Notas:{" "}
+                      <span className="text-gray-200">
+                        {detail.order.notes}
+                      </span>
                     </p>
                   )}
                 </div>
@@ -287,18 +316,24 @@ export default function AdminVentasPage() {
                 <div className="bg-black/20 border border-white/10 rounded-2xl p-4">
                   <p className="font-semibold mb-2">Items</p>
                   <div className="space-y-2">
-
                     {detail.items.map((it) => (
-  <div key={it.id} className="flex items-center justify-between text-sm">
-    <span className="text-gray-200">
-      {it.product_name || `Prod ${it.product_id}`} · x{it.qty}
-      <span className="text-gray-400"> · {formatARS(it.price)} c/u</span>
-    </span>
-    <span className="font-semibold">{formatARS(it.subtotal)}</span>
-  </div>
-))}
-
-
+                      <div
+                        key={it.id}
+                        className="flex items-center justify-between text-sm"
+                      >
+                        <span className="text-gray-200">
+                          {it.product_name || `Prod ${it.product_id}`} · x
+                          {it.qty}
+                          <span className="text-gray-400">
+                            {" "}
+                            · {formatARS(it.price)} c/u
+                          </span>
+                        </span>
+                        <span className="font-semibold">
+                          {formatARS(it.subtotal)}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -319,7 +354,9 @@ export default function AdminVentasPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-gray-300 text-sm">No se pudo cargar el detalle.</p>
+              <p className="text-gray-300 text-sm">
+                No se pudo cargar el detalle.
+              </p>
             )}
           </div>
         </div>

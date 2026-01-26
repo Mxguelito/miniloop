@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-
+import { useNavigate, Link } from "react-router-dom";
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -12,7 +10,7 @@ export default function RegisterPage() {
     nombre: "",
     email: "",
     password: "",
-    role: "PROPIETARIO"   // por defecto propietario
+    role: "PROPIETARIO",
   });
 
   const [msg, setMsg] = useState("");
@@ -36,86 +34,134 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="h-screen flex items-center justify-center bg-[#0f1115] text-white">
-      <button
+    <div className="min-h-screen flex items-center justify-center bg-[#0f1115] text-white px-4">
+      {/* WRAPPER */}
+      <div className="relative w-full max-w-md">
+        {/* VOLVER AL HOME */}
+       <button
   type="button"
   onClick={() => navigate("/")}
-  className="absolute top-10 left-10 px-4 py-2 rounded-lg bg-white/10 border border-white/20 
-             hover:bg-white/20 transition text-green-300 backdrop-blur-md"
+  className="
+    mt-4 mb-8
+    md:absolute md:-top-20 md:left-0
+
+    flex items-center gap-2
+    px-4 py-2 rounded-xl
+    bg-white/10 border border-white/10
+    text-sm text-blue-300
+    hover:bg-white/20 transition
+    backdrop-blur-md
+  "
 >
-  ← Volver al Home
-</button>
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-[#151820] p-8 rounded-2xl w-96 border border-green-500/30 shadow-[0_0_25px_rgba(0,255,150,0.15)]"
-      >
-        <h2 className="text-3xl mb-6 font-bold text-green-300 text-center">
-          Crear Cuenta
-        </h2>
-
-        {msg && (
-          <div className="bg-green-600/20 border border-green-500 text-green-300 p-2 rounded mb-4 text-center">
-            {msg}
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-600/20 border border-red-500 text-red-300 p-2 rounded mb-4 text-center">
-            {error}
-          </div>
-        )}
-
-        <label>Nombre</label>
-        <input
-          name="nombre"
-          className="w-full p-2 mb-3 rounded bg-gray-800 border border-gray-700"
-          onChange={handleChange}
-        />
-
-        <label>Email</label>
-        <input
-          name="email"
-          className="w-full p-2 mb-3 rounded bg-gray-800 border border-gray-700"
-          onChange={handleChange}
-        />
-
-        <label>Contraseña</label>
-        <input
-          name="password"
-          type="password"
-          className="w-full p-2 mb-3 rounded bg-gray-800 border border-gray-700"
-          onChange={handleChange}
-        />
-
-        <label>Rol</label>
-        <select
-          name="role"
-          className="w-full p-2 mb-6 rounded bg-gray-800 border border-gray-700"
-          value={form.role}
-          onChange={handleChange}
-        >
-          <option value="PROPIETARIO">Propietario</option>
-          <option value="INQUILINO">Inquilino</option>
-          <option value="TESORERO">Tesorero</option>
-          
-        </select>
-
-        <button
-          type="submit"
-          className="w-full py-2 bg-green-600 rounded-lg hover:bg-green-500 text-white font-semibold"
-        >
-          Registrarme
+          ← Volver al Home
         </button>
 
-        <p className="mt-3 text-sm text-center text-gray-300">
-          ¿Ya tenés cuenta?{" "}
-          <Link to="/login" className="text-green-400 hover:underline">
-  Iniciar sesión
-</Link>
+        {/* CARD REGISTER */}
+        <form
+          onSubmit={handleSubmit}
+          className="
+            bg-[#151820]/90 backdrop-blur-xl
+            p-8 rounded-3xl
+            border border-violet-500/30
+            shadow-[0_0_40px_rgba(139,92,246,0.25)]
+          "
+        >
+          <h2
+            className="
+              text-3xl mb-6 font-extrabold text-center
+              bg-gradient-to-r from-blue-400 to-violet-400
+              bg-clip-text text-transparent
+            "
+          >
+            Crear cuenta
+          </h2>
 
-        </p>
-      </form>
+          {msg && (
+            <div className="bg-blue-600/20 border border-blue-500 text-blue-300 p-2 rounded-lg mb-4 text-center text-sm">
+              {msg}
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-600/20 border border-red-500 text-red-300 p-2 rounded-lg mb-4 text-center text-sm">
+              {error}
+            </div>
+          )}
+
+          <label className="text-sm text-slate-300">Nombre</label>
+          <input
+            name="nombre"
+            className="
+              w-full p-3 mb-3 rounded-xl
+              bg-[#0f172a] border border-white/10
+              focus:outline-none focus:border-violet-400/60
+            "
+            onChange={handleChange}
+          />
+
+          <label className="text-sm text-slate-300">Email</label>
+          <input
+            name="email"
+            type="email"
+            className="
+              w-full p-3 mb-3 rounded-xl
+              bg-[#0f172a] border border-white/10
+              focus:outline-none focus:border-violet-400/60
+            "
+            onChange={handleChange}
+          />
+
+          <label className="text-sm text-slate-300">Contraseña</label>
+          <input
+            name="password"
+            type="password"
+            className="
+              w-full p-3 mb-3 rounded-xl
+              bg-[#0f172a] border border-white/10
+              focus:outline-none focus:border-violet-400/60
+            "
+            onChange={handleChange}
+          />
+
+          <label className="text-sm text-slate-300">Rol</label>
+          <select
+            name="role"
+            value={form.role}
+            onChange={handleChange}
+            className="
+              w-full p-3 mb-6 rounded-xl
+              bg-[#0f172a] border border-white/10
+              focus:outline-none focus:border-violet-400/60
+            "
+          >
+            <option value="PROPIETARIO">Propietario</option>
+            <option value="INQUILINO">Inquilino</option>
+            <option value="TESORERO">Tesorero</option>
+          </select>
+
+          <button
+            type="submit"
+            className="
+              w-full py-3 rounded-xl
+              bg-gradient-to-r from-blue-600 to-violet-600
+              hover:from-blue-500 hover:to-violet-500
+              text-white font-semibold
+              transition-all
+              shadow-[0_0_25px_rgba(139,92,246,0.45)]
+            "
+          >
+            Registrarme
+          </button>
+
+          <p className="mt-4 text-sm text-center text-slate-300">
+            ¿Ya tenés cuenta?{" "}
+            <Link to="/login" className="text-blue-400 hover:underline">
+              Iniciar sesión
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }

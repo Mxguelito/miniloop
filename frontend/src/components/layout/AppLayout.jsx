@@ -6,8 +6,7 @@ export default function AppLayout({ children }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex bg-[#0f172a] text-white">
-      
+    <div className="min-h-screen flex bg-gradient-to-br from-[#0b1220] to-[#0f172a] text-slate-100">
       {/* Sidebar Desktop */}
       <Sidebar />
 
@@ -21,22 +20,25 @@ export default function AppLayout({ children }) {
           />
 
           {/* drawer */}
-          <div className="absolute left-0 top-0 h-full w-72 bg-[#1e293b] border-r border-white/10 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-extrabold text-blue-400 tracking-wide">
+          <div className="absolute left-0 top-0 min-h-screen w-72 bg-[#111827] shadow-2xl shadow-black/40 flex flex-col">
+            {/* Header mobile */}
+            <div className="p-6 flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-blue-400 tracking-tight">
                 Miniloop
               </h2>
 
               <button
                 onClick={() => setOpen(false)}
-                className="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15 transition"
+                className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 transition"
               >
                 ✖
               </button>
             </div>
 
-            {/* Reutilizamos Sidebar pero en modo mobile */}
-            <Sidebar mobile onNavigate={() => setOpen(false)} />
+            {/* Sidebar scrollable */}
+            <div className="flex-1 overflow-y-auto">
+              <Sidebar mobile onNavigate={() => setOpen(false)} />
+            </div>
           </div>
         </div>
       )}

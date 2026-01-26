@@ -3,23 +3,21 @@ import AppLayout from "../components/layout/AppLayout";
 import { getDeudores } from "../services/liquidacionesService";
 import { getLiquidaciones } from "../services/liquidacionesService";
 
-
 export default function TesoreroDashboard() {
   const [deudores, setDeudores] = useState([]);
 
- useEffect(() => {
-  async function load() {
-    const d = await getDeudores();
-    console.log("🔥 DEUDORES CALCULADOS:", d);
+  useEffect(() => {
+    async function load() {
+      const d = await getDeudores();
+      console.log("🔥 DEUDORES CALCULADOS:", d);
 
-    const all = await getLiquidaciones();
-    console.log("📦 LIQUIDACIONES COMPLETAS:", all);
+      const all = await getLiquidaciones();
+      console.log("📦 LIQUIDACIONES COMPLETAS:", all);
 
-    setDeudores(d);
-  }
-  load();
-}, []);
-
+      setDeudores(d);
+    }
+    load();
+  }, []);
 
   return (
     <AppLayout>
@@ -29,10 +27,8 @@ export default function TesoreroDashboard() {
 
       {/* GRID DE NOTAS POST-IT */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
-
-     
         {/* NOTA AUTOMÁTICA DEUDORES */}
-        
+
         <div
           className="
             bg-yellow-300 
@@ -68,9 +64,8 @@ export default function TesoreroDashboard() {
           </p>
         </div>
 
-        
         {/*  NOTA TAREAS */}
-        
+
         <div
           className="
             bg-red-300 
@@ -85,7 +80,6 @@ export default function TesoreroDashboard() {
           <h2 className="text-xl font-bold mb-3">📝 Tareas del tesorero</h2>
 
           <ul className="space-y-2">
-
             <li className="flex items-center gap-2">
               <input type="checkbox" className="w-4 h-4" />
               Generar liquidación del mes
@@ -105,14 +99,12 @@ export default function TesoreroDashboard() {
               <input type="checkbox" className="w-4 h-4" />
               Exportar PDF del mes
             </li>
-
           </ul>
 
           <p className="text-sm mt-4 italic opacity-70">
             *Próximamente tareas automáticas
           </p>
         </div>
-
       </div>
     </AppLayout>
   );

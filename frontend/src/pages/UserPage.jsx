@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { getUsers, createUser, updateUser, deleteUser } from "../services/usersService";
+import {
+  getUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+} from "../services/usersService";
 import AppLayout from "../components/layout/AppLayout";
 
 export default function UsersPage() {
@@ -108,7 +113,6 @@ export default function UsersPage() {
       {modalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
           <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md">
-
             <h2 className="text-2xl font-bold mb-4">
               {editingUser ? "Editar Usuario" : "Nuevo Usuario"}
             </h2>
@@ -119,9 +123,7 @@ export default function UsersPage() {
                 <input
                   className="w-full px-3 py-2 rounded bg-gray-700"
                   value={form.name}
-                  onChange={(e) =>
-                    setForm({ ...form, name: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
                 />
               </div>
 
@@ -131,9 +133,7 @@ export default function UsersPage() {
                   type="email"
                   className="w-full px-3 py-2 rounded bg-gray-700"
                   value={form.email}
-                  onChange={(e) =>
-                    setForm({ ...form, email: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
                 />
               </div>
 
@@ -142,9 +142,7 @@ export default function UsersPage() {
                 <select
                   className="w-full px-3 py-2 rounded bg-gray-700"
                   value={form.role}
-                  onChange={(e) =>
-                    setForm({ ...form, role: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, role: e.target.value })}
                 >
                   <option value="ADMIN">ADMIN</option>
                   <option value="TESORERO">TESORERO</option>

@@ -6,65 +6,67 @@ import LiquidacionIcon from "../icons/LiquidacionIcon";
 import UnidadIcon from "../icons/UnidadIcon";
 import Button from "../ui/Button";
 import KioscoIcon from "../icons/KioscoIcon";
-
+import { useLocation } from "react-router-dom";
 
 export default function Sidebar({ mobile = false, onNavigate }) {
-
   const { user, logout } = useAuth();
+  const location = useLocation();
 
+  // 👉 BASE DEL SIDEBAR (ACÁ VA EL BASECLASS)
   const baseClass =
-  "bg-[#1e293b] p-6 flex flex-col border-r border-white/10";
+    "bg-[#111827] p-6 flex flex-col h-full shadow-xl shadow-black/30";
 
   return (
-     <aside
-    className={
-      mobile
-        ? `${baseClass} w-full h-full`
-        : `${baseClass} w-64 hidden md:flex`
-    }
-  >
-      <h2 className="text-3xl font-extrabold mb-10 text-blue-400 tracking-wide">
-        Miniloop
-      </h2>
+    <aside
+      className={
+        mobile
+          ? `${baseClass} w-full`
+          : `${baseClass} w-64 hidden md:flex m-4 rounded-2xl`
+      }
+    >
+      {/* HEADER */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold text-blue-400 tracking-tight">
+          Miniloop
+        </h2>
+      </div>
 
-      <nav className="flex flex-col gap-2 text-lg">
+      {/* NAV (SCROLLEABLE) */}
+      <nav className="flex-1 flex flex-col gap-1 text-sm font-medium text-slate-300 overflow-y-auto pr-1">
         {/* HOME GLOBAL */}
         <SidebarItem to="/dashboard" icon={<DashboardIcon />}>
           Home
         </SidebarItem>
 
-        {/* KIOSCO (GLOBAL) */}
-<SidebarItem to="/kiosco" icon={<KioscoIcon />}>
-  Kiosco
-</SidebarItem>
-
-
+        {/* KIOSCO */}
+        <SidebarItem to="/kiosco" icon={<KioscoIcon />}>
+          Kiosco
+        </SidebarItem>
 
         {/* ADMIN */}
-{user.role === "ADMIN" && (
-  <>
-    <SidebarItem to="/admin" icon={<DashboardIcon />}>
-      Panel Admin
-    </SidebarItem>
+        {user.role === "ADMIN" && (
+          <>
+            <SidebarItem to="/admin" icon={<DashboardIcon />}>
+              Panel Admin
+            </SidebarItem>
 
-    <SidebarItem to="/admin/usuarios" icon={<HomeIcon />}>
-      Usuarios
-    </SidebarItem>
+            <SidebarItem to="/admin/usuarios" icon={<HomeIcon />}>
+              Usuarios
+            </SidebarItem>
 
-    <SidebarItem to="/admin/kiosco-productos" icon={<KioscoIcon />}>
-      Kiosco - Productos
-    </SidebarItem>
+            <SidebarItem to="/admin/kiosco-productos" icon={<KioscoIcon />}>
+              Kiosco - Productos
+            </SidebarItem>
 
-    <SidebarItem to="/admin/ventas" icon={<LiquidacionIcon />}>
-      Ventas / Pedidos
-    </SidebarItem>
+            <SidebarItem to="/admin/ventas" icon={<LiquidacionIcon />}>
+              Ventas / Pedidos
+            </SidebarItem>
 
-    <SidebarItem to="/consorcios" icon={<HomeIcon />}>
-      Consorcios
-    </SidebarItem>
-  </>
-)}
-
+            <SidebarItem to="/consorcios" icon={<HomeIcon />}>
+              Consorcios
+            </SidebarItem>
+          </>
+        )}
 
         {/* TESORERO */}
         {user.role === "TESORERO" && (
@@ -96,7 +98,7 @@ export default function Sidebar({ mobile = false, onNavigate }) {
           </>
         )}
 
-        {/* INQUILINO (si lo usás más adelante) */}
+        {/* INQUILINO */}
         {user.role === "INQUILINO" && (
           <SidebarItem to="/mi-unidad" icon={<UnidadIcon />}>
             Mi unidad
@@ -104,26 +106,36 @@ export default function Sidebar({ mobile = false, onNavigate }) {
         )}
       </nav>
 
-     <Button
-  variant="danger"
-  onClick={logout}
-  className="mt-auto w-full"
->
-  Cerrar sesión
-</Button>
-
+      {/* FOOTER FIJO */}
+      <div className="pt-4">
+        <Button
+          variant="danger"
+          onClick={logout}
+          className="w-full text-sm font-medium"
+        >
+          Cerrar sesión
+        </Button>
+      </div>
     </aside>
   );
 }
 
-//  mini componente para cada item del menú
+// ITEM DEL SIDEBAR
 function SidebarItem({ to, icon, children }) {
+  const location = useLocation();
+  const isActive = location.pathname === to;
   return (
     <Link
       to={to}
-      className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition"
+      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium tracking-tight transition
+    ${
+      isActive
+        ? "bg-blue-500/15 text-blue-400 shadow-inner shadow-blue-500/20"
+        : "text-slate-300 hover:bg-white/10 hover:text-white"
+    }
+  `}
     >
-      <span className="w-6">{icon}</span>
+      <span className="w-6 flex justify-center">{icon}</span>
       {children}
     </Link>
   );

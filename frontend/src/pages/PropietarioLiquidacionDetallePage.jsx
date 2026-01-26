@@ -10,7 +10,6 @@ import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 
-
 export default function PropietarioLiquidacionDetallePage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -51,17 +50,15 @@ export default function PropietarioLiquidacionDetallePage() {
   }
 
   const pendienteNum = Number(data.pendiente ?? 0);
-const expensaNum = Number(data.expensaTotal ?? 0);
+  const expensaNum = Number(data.expensaTotal ?? 0);
 
-let estadoPago = "Parcial";
-if (pendienteNum <= 0) estadoPago = "Pagado";
-else if (pendienteNum === expensaNum) estadoPago = "Pendiente";
-
+  let estadoPago = "Parcial";
+  if (pendienteNum <= 0) estadoPago = "Pagado";
+  else if (pendienteNum === expensaNum) estadoPago = "Pendiente";
 
   return (
     <AppLayout>
       <div className="p-6 text-white">
-
         {/* HEADER */}
         <div className="bg-[#0d1224] p-8 rounded-2xl mb-10 border border-white/10 shadow-xl">
           <h1 className="text-3xl font-bold">
@@ -72,70 +69,67 @@ else if (pendienteNum === expensaNum) estadoPago = "Pendiente";
             Consorcio: {data.consorcio_nombre ?? "—"}
           </p>
 
-         
           {/* Estado */}
-{/* Estado de pago */}
-<div className="mt-3">
-  <Badge
-    color={
-      estadoPago === "Pagado"
-        ? "green"
-        : estadoPago === "Pendiente"
-        ? "red"
-        : "yellow"
-    }
-  >
-    {estadoPago}
-  </Badge>
-</div>
-
-
+          {/* Estado de pago */}
+          <div className="mt-3">
+            <Badge
+              color={
+                estadoPago === "Pagado"
+                  ? "green"
+                  : estadoPago === "Pendiente"
+                    ? "red"
+                    : "yellow"
+              }
+            >
+              {estadoPago}
+            </Badge>
+          </div>
 
           {/* Botones */}
           <div className="mt-6 flex gap-4">
-          <Button variant="secondary" onClick={() => navigate(-1)}>
-  ← Volver
-</Button>
+            <Button variant="secondary" onClick={() => navigate(-1)}>
+              ← Volver
+            </Button>
 
-<Button
-  variant="purple"
-  onClick={() =>
-    exportLiquidacionPDF({
-      ...data,
-      expensaMes: data.expensaTotal,
-      montoAbonado: data.pagado,
-      expensaAdeudada: data.pendiente,
-    })
-  }
->
-  Descargar PDF
-</Button>
-
-
+            <Button
+              variant="purple"
+              onClick={() =>
+                exportLiquidacionPDF({
+                  ...data,
+                  expensaMes: data.expensaTotal,
+                  montoAbonado: data.pagado,
+                  expensaAdeudada: data.pendiente,
+                })
+              }
+            >
+              Descargar PDF
+            </Button>
           </div>
         </div>
 
         {/* RESUMEN */}
-       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card>
+            <p className="text-sm text-blue-300">Total del mes</p>
+            <h2 className="text-3xl font-bold mt-2">
+              {formatMoney(data.expensaTotal)}
+            </h2>
+          </Card>
 
-  <Card>
-  <p className="text-sm text-blue-300">Total del mes</p>
-  <h2 className="text-3xl font-bold mt-2">{formatMoney(data.expensaTotal)}</h2>
-</Card>
+          <Card>
+            <p className="text-sm text-green-300">Pagado</p>
+            <h2 className="text-3xl font-bold mt-2 text-green-400">
+              {formatMoney(data.pagado)}
+            </h2>
+          </Card>
 
-<Card>
-  <p className="text-sm text-green-300">Pagado</p>
-  <h2 className="text-3xl font-bold mt-2 text-green-400">{formatMoney(data.pagado)}</h2>
-</Card>
-
-<Card>
-  <p className="text-sm text-red-300">Pendiente</p>
-  <h2 className="text-3xl font-bold mt-2 text-red-400">{formatMoney(data.pendiente)}</h2>
-</Card>
-
-
-</div>
-
+          <Card>
+            <p className="text-sm text-red-300">Pendiente</p>
+            <h2 className="text-3xl font-bold mt-2 text-red-400">
+              {formatMoney(data.pendiente)}
+            </h2>
+          </Card>
+        </div>
       </div>
     </AppLayout>
   );

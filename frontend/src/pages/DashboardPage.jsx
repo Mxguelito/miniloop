@@ -5,9 +5,6 @@ import { getUsers } from "../services/usersService";
 import { getConsorcios } from "../services/consorciosService";
 import { Link } from "react-router-dom";
 
-
-
-
 export default function DashboardPage() {
   const { user } = useAuth();
 
@@ -58,21 +55,21 @@ export default function DashboardPage() {
         </ul>
       </div>
       <div className="mt-8">
-  <Link
-    to="/kiosco"
-    className="block bg-gradient-to-r from-blue-500/20 to-purple-500/20
+        <Link
+          to="/kiosco"
+          className="block bg-gradient-to-r from-blue-500/20 to-purple-500/20
                border border-white/10 rounded-xl p-6 hover:bg-white/5 transition"
-  >
-    <h2 className="text-2xl font-bold">🛒 Kiosco del Consorcio</h2>
-    <p className="text-gray-300 mt-2">
-      Comprá snacks, bebidas y artículos sin salir. Pedidos internos rápidos.
-    </p>
-    <div className="mt-4 inline-flex px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-400/30">
-      Abrir kiosco
-    </div>
-  </Link>
-</div>
-
+        >
+          <h2 className="text-2xl font-bold">🛒 Kiosco del Consorcio</h2>
+          <p className="text-gray-300 mt-2">
+            Comprá snacks, bebidas y artículos sin salir. Pedidos internos
+            rápidos.
+          </p>
+          <div className="mt-4 inline-flex px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-400/30">
+            Abrir kiosco
+          </div>
+        </Link>
+      </div>
     </AppLayout>
   );
 }

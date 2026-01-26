@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import Button from "../components/ui/Button";
-import { Link } from "react-router-dom";
- 
+import { useNavigate, Link } from "react-router-dom";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,13 +15,11 @@ export default function LoginPage() {
     setError("");
 
     const res = await login(email, password);
-
     if (!res.ok) {
       setError(res.message);
       return;
     }
 
-    // Redirección inteligente según rol
     if (res.user.role === "ADMIN") navigate("/admin");
     else if (res.user.role === "TESORERO") navigate("/tesorero");
     else if (res.user.role === "PROPIETARIO") navigate("/propietario");
@@ -33,75 +28,104 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="h-screen flex items-center justify-center bg-[#0f1115] text-white relative">
-      <button
-  type="button"
-  onClick={() => navigate("/")}
-  className="absolute top-10 left-10 px-4 py-2 rounded-lg bg-white/10 border border-white/20 
-             hover:bg-white/20 transition text-blue-300 backdrop-blur-md"
->
-  ← Volver al Home
-</button>
+    <div className="min-h-screen flex items-center justify-center bg-[#0f1115] text-white px-4">
+      
+      {/* WRAPPER */}
+      <div className="relative w-full max-w-md">
 
+        {/* VOLVER AL HOME */}
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="
+            mb-6
+            md:absolute md:-top-14 md:left-0
+            flex items-center gap-2
+            px-4 py-2 rounded-xl
+            bg-white/10 border border-white/10
+            text-sm text-blue-300
+            hover:bg-white/20 transition
+            backdrop-blur-md
+          "
+        >
+          ← Volver al Home
+        </button>
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-[#151820] p-8 rounded-2xl w-96 border border-blue-500/30 shadow-[0_0_25px_rgba(0,150,255,0.15)]"
-      >
-        <h2 className="text-3xl mb-6 font-bold text-blue-300 text-center">
-          Miniloop Login
-        </h2>
+        {/* CARD LOGIN */}
+        <form
+          onSubmit={handleSubmit}
+          className="
+            bg-[#151820]/90 backdrop-blur-xl
+            p-8 rounded-3xl
+            border border-blue-500/30
+            shadow-[0_0_40px_rgba(0,150,255,0.25)]
+          "
+        >
+          <h2 className="text-3xl mb-6 font-extrabold text-blue-300 text-center">
+            Miniloop Login
+          </h2>
 
-        {error && (
-          <div className="bg-red-600/30 border border-red-500 text-red-300 p-2 rounded mb-4 text-center">
-            {error}
-          </div>
-        )}
+          {error && (
+            <div className="bg-red-600/20 border border-red-500 text-red-300 p-2 rounded-lg mb-4 text-center text-sm">
+              {error}
+            </div>
+          )}
 
-        <label>Email</label>
-        <input
-          type="email"
-          className="w-full p-2 mb-4 rounded bg-gray-800 border border-gray-700"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          <label className="text-sm text-slate-300">Email</label>
+          <input
+            type="email"
+            className="
+              w-full p-3 mb-4 rounded-xl
+              bg-[#0f172a] border border-white/10
+              focus:outline-none focus:border-blue-400/60
+            "
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-       <label>Contraseña</label>
-<input
-  type="password"
-  className="w-full p-2 mb-2 rounded bg-gray-800 border border-gray-700"
-  value={password}
-  onChange={(e) => setPassword(e.target.value)}
-/>
+          <label className="text-sm text-slate-300">Contraseña</label>
+          <input
+            type="password"
+            className="
+              w-full p-3 mb-2 rounded-xl
+              bg-[#0f172a] border border-white/10
+              focus:outline-none focus:border-blue-400/60
+            "
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-{/* LINK OLVIDASTE TU CONTRASEÑA */}
-<button
-  type="button"
-  onClick={() =>
-    alert("Próximamente podrás recuperar tu contraseña desde aquí 🔐")
-  }
-  className="w-full text-right text-xs text-blue-400 hover:underline mb-4"
->
-  ¿Olvidaste tu contraseña?
-</button>
+          <button
+            type="button"
+            onClick={() =>
+              alert("Próximamente podrás recuperar tu contraseña 🔐")
+            }
+            className="w-full text-right text-xs text-blue-400 hover:underline mb-4"
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
 
-<button
-  type="submit"
-  className="w-full py-2 bg-blue-600 rounded-lg hover:bg-blue-500 
-             text-white font-semibold transition-all"
->
-  Entrar
-</button>
+          <button
+            type="submit"
+            className="
+              w-full py-3 rounded-xl
+              bg-blue-600 hover:bg-blue-500
+              text-white font-semibold
+              transition-all
+              shadow-[0_0_20px_rgba(59,130,246,0.4)]
+            "
+          >
+            Entrar
+          </button>
 
-
-        <p className="mt-3 text-sm text-center text-gray-300">
-          ¿No tenés cuenta?{" "}
-          <Link to="/register" className="text-blue-400 hover:underline">
-  Crear cuenta
-</Link>
-
-        </p>
-      </form>
+          <p className="mt-4 text-sm text-center text-slate-300">
+            ¿No tenés cuenta?{" "}
+            <Link to="/register" className="text-blue-400 hover:underline">
+              Crear cuenta
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }

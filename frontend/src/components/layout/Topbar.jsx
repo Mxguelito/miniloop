@@ -7,7 +7,8 @@ export default function Topbar({ onOpenMenu }) {
   const { user } = useAuth();
 
   return (
-    <header className="w-full bg-[#1e293b] p-4 border-b border-white/10 flex justify-between items-center">
+    <header className="w-full bg-[#111827]/80 backdrop-blur-md p-4 flex justify-between items-center">
+
   <div className="flex items-center gap-3">
     {/* Botón hamburguesa SOLO mobile */}
     <button
@@ -17,7 +18,8 @@ export default function Topbar({ onOpenMenu }) {
       ☰
     </button>
 
-    <span className="text-lg flex items-center gap-2">
+    <span className="text-sm font-medium text-slate-300 flex items-center gap-2">
+
       Rol:
       <Badge
         color={
@@ -35,7 +37,8 @@ export default function Topbar({ onOpenMenu }) {
     </span>
   </div>
 
-  <span className="text-lg font-semibold">{user.name}</span>
+  <span className="text-sm font-semibold text-slate-100">{user.name}</span>
+
 </header>
 
   );

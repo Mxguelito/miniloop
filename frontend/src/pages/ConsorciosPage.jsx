@@ -86,7 +86,10 @@ export default function ConsorciosPage() {
                 <td className="px-4 py-3">{c.direccion}</td>
                 <td className="px-4 py-3">{c.unidades}</td>
                 <td className="px-4 py-3 flex gap-4">
-                  <button onClick={() => handleEdit(c)} className="text-blue-400">
+                  <button
+                    onClick={() => handleEdit(c)}
+                    className="text-blue-400"
+                  >
                     Editar
                   </button>
                   <button
@@ -123,7 +126,9 @@ export default function ConsorciosPage() {
                   type="text"
                   placeholder="Dirección"
                   value={form.direccion}
-                  onChange={(e) => setForm({ ...form, direccion: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, direccion: e.target.value })
+                  }
                   className="bg-[#09131b] p-2 rounded"
                   required
                 />
@@ -132,7 +137,9 @@ export default function ConsorciosPage() {
                   type="number"
                   placeholder="Unidades"
                   value={form.unidades}
-                  onChange={(e) => setForm({ ...form, unidades: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, unidades: e.target.value })
+                  }
                   className="bg-[#09131b] p-2 rounded"
                   required
                 />
