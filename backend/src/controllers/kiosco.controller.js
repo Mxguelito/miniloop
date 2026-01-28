@@ -426,3 +426,22 @@ if (currentStatus === "CANCELLED" || currentStatus === "DELIVERED") {
   }
 }
 
+export async function adminDeleteProduct(req, res) {
+  if (req.user?.role !== "ADMIN") {
+    return res.status(403).json({ message: "Solo ADMIN" });
+  }
+
+  try {
+    const { id } = req.params;
+
+    await pool.query(
+      `DELETE FROM kiosco_products WHERE id = $1`,
+      [id]
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error al eliminar producto" });
+  }
+}

@@ -10,6 +10,7 @@ import {
     adminGetOrders,
   adminGetOrderById,
   adminUpdateOrderStatus,
+   adminDeleteProduct,
 
 } from "../controllers/kiosco.controller.js";
 
@@ -24,6 +25,8 @@ router.put("/products/:id", authRequired, adminUpdateProduct);
 router.patch("/products/:id/stock", authRequired, adminUpdateStock);
 router.patch("/products/:id/toggle", authRequired, adminToggleActive);
 router.post("/orders", authRequired, createOrder);
+router.delete("/products/:id", authRequired, adminDeleteProduct);
+
 
 // Admin: pedidos/ventas
 router.get("/orders", authRequired, adminGetOrders);
