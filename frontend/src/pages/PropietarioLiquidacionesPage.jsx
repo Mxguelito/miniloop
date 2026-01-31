@@ -1,138 +1,134 @@
-import React, { useEffect, useState } from "react";
 import AppLayout from "../components/layout/AppLayout";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatMoney } from "../services/liquidacionesService";
-import { exportLiquidacionPDF } from "../utils/exportLiquidacionPDF";
-import { getLiquidacionesPropietario } from "../services/propietarioService"; 
 import Badge from "../components/ui/Badge";
-import Button from "../components/ui/Button";
+import PageHeader from "../components/ui/PageHeader";
 
-
-
-
+import { useMisLiquidaciones } from "../hooks/propietario/useMisLiquidaciones";
 
 export default function PropietarioLiquidacionesPage() {
   const navigate = useNavigate();
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  
-  // CARGAR LIQUIDACIONES DEL PROPIETARIO
-  
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await getLiquidacionesPropietario();
-        console.log("📄 Liquidaciones propietario:", res);
-        setItems(res);
-      } catch (err) {
-        console.error("Error cargando liquidaciones del propietario:", err);
-      }
-      setLoading(false);
-    }
-    load();
-  }, []);
+  const { items, loading, hasData } = useMisLiquidaciones();
 
   return (
     <AppLayout>
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-white">Mis Liquidaciones</h1>
-        <p className="text-gray-400">Historial de liquidaciones del propietario</p>
+      {/* BACKGROUND WRAP */}
+      <div className="min-h-screen bg-gradient-to-br from-[#0b1020] via-[#0f172a] to-[#020617] px-4 py-6 md:px-10 md:py-10">
+        <div className="mx-auto max-w-6xl space-y-8">
+          {/* HEADER */}
+          <PageHeader
+            title="Mis Liquidaciones"
+            subtitle="Historial de liquidaciones del propietario"
+            role="PROPIETARIO"
+          />
+
+          {/* LOADING */}
+          {loading && (
+            <div className="flex justify-center items-center h-64">
+              <Loader2 className="animate-spin w-10 h-10 text-cyan-400" />
+            </div>
+          )}
+
+          {/* EMPTY */}
+          {!loading && !hasData && (
+            <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-5 text-white/70">
+              No se encontraron liquidaciones.
+            </div>
+          )}
+
+          {/* GRID FUTURISTA */}
+          {!loading && hasData && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {items.map((lq) => (
+                <div
+                  key={lq.liquidacion_id}
+                  className="
+                    rounded-3xl
+                    bg-white/5
+                    backdrop-blur-xl
+                    border border-white/10
+                    p-6
+                    transition-all duration-300
+                    hover:shadow-[0_0_40px_rgba(56,189,248,0.35)]
+                  "
+                >
+                  {/* HEADER CARD */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h2 className="text-lg font-semibold text-white">
+                        {lq.mes}/{lq.anio}
+                      </h2>
+                      <p className="text-xs text-white/60">
+                        Liquidación mensual
+                      </p>
+                    </div>
+
+                    {/* ESTADO */}
+                    <Badge
+                      color={
+                        lq.estado === "Pagado"
+                          ? "green"
+                          : lq.estado === "Pendiente"
+                            ? "red"
+                            : "yellow"
+                      }
+                    >
+                      {lq.estado}
+                    </Badge>
+                  </div>
+
+                  {/* TOTAL */}
+                  <div className="mb-4">
+                    <p className="text-xs text-white/60">Total del mes</p>
+                    <p className="text-2xl font-bold text-white">
+                      {formatMoney(lq.expensaTotal)}
+                    </p>
+                  </div>
+
+                  {/* PAGADO / PENDIENTE */}
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <div className="rounded-xl bg-emerald-400/10 border border-emerald-400/30 p-3">
+                      <p className="text-xs text-emerald-300">Pagado</p>
+                      <p className="text-sm font-semibold text-emerald-200">
+                        {formatMoney(lq.pagado)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-red-400/10 border border-red-400/30 p-3">
+                      <p className="text-xs text-red-300">Pendiente</p>
+                      <p className="text-sm font-semibold text-red-200">
+                        {formatMoney(lq.pendiente)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* ACTION */}
+                  <button
+                    onClick={() =>
+                      navigate(`/propietario/liquidacion/${lq.liquidacion_id}`)
+                    }
+                    className="
+                      w-full
+                      rounded-2xl
+                      py-3
+                      text-sm
+                      font-semibold
+                      text-black
+                      bg-gradient-to-r from-cyan-400 to-sky-400
+                      hover:from-cyan-300 hover:to-sky-300
+                      transition
+                      shadow-[0_0_30px_rgba(56,189,248,0.5)]
+                    "
+                  >
+                    Ver detalle
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-
-      {/* LOADING */}
-      {loading && (
-        <div className="flex justify-center items-center h-64">
-          <Loader2 className="animate-spin w-10 h-10 text-blue-500" />
-        </div>
-      )}
-
-      {/* SIN DATOS */}
-      {!loading && items.length === 0 && (
-        <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4 text-gray-300">
-          No se encontraron liquidaciones.
-        </div>
-      )}
-
-      {/* GRID DE CARDS TESLA */}
-{!loading && items.length > 0 && (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {items.map((lq) => (
-      <div
-        key={lq.liquidacion_id}
-
-        className="p-6 rounded-2xl bg-[#0f1115] border border-blue-500/20 
-                   shadow-[0_0_20px_rgba(0,150,255,0.15)] 
-                   hover:shadow-[0_0_35px_rgba(0,150,255,0.25)]
-                   transition-all duration-300"
-      >
-
-        {/* Header */}
-        <h2 className="text-xl font-bold text-blue-300 mb-1">
-          {lq.mes}/{lq.anio}
-        </h2>
-        <p className="text-gray-400 text-sm mb-4">
-          Liquidación mensual
-        </p>
-
-        {/* Monto total */}
-        <div className="mb-3">
-          <p className="text-gray-400 text-sm">Total del mes:</p>
-          <p className="text-2xl font-bold text-white">
-            {formatMoney(lq.expensaTotal)}
-          </p>
-        </div>
-
-        {/* Pagado y pendiente */}
-        <div className="flex justify-between mb-4">
-          <div>
-            <p className="text-gray-400 text-xs">Pagado</p>
-            <p className="text-green-400 font-semibold">
-              {formatMoney(lq.pagado)}
-            </p>
-          </div>
-          <div>
-            <p className="text-gray-400 text-xs">Pendiente</p>
-            <p className="text-red-400 font-semibold">
-              {formatMoney(lq.pendiente)}
-            </p>
-          </div>
-        </div>
-
-        
-        {/* ESTADO */}
-<div className="mb-4">
-  <Badge
-    color={
-      lq.estado === "Pagado"
-        ? "green"
-        : lq.estado === "Pendiente"
-        ? "red"
-        : "yellow"
-    }
-  >
-    {lq.estado}
-  </Badge>
-</div>
-
-
-        {/* BOTONES */}
-        <div className="flex justify-between mt-4">
-         <Button
-  variant="primary"
-  onClick={() => navigate(`/propietario/liquidacion/${lq.liquidacion_id}`)}
->
-  Ver
-</Button>
-
-
-        </div>
-      </div>
-    ))}
-  </div>
-)}
-
     </AppLayout>
   );
 }

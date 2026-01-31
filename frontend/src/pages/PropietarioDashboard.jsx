@@ -5,6 +5,11 @@ import axiosInstance from "../api/axiosInstance";
 import { Loader2 } from "lucide-react";
 import StatBox from "../components/ui/StatBox";
 import Card from "../components/ui/Card";
+import InicioHeader from "../components/propietario/InicioHeader";
+import EstadoUnidad from "../components/propietario/EstadoUnidad";
+import AccionesRapidas from "../components/propietario/AccionesRapidas";
+import AnimatedSection from "../components/ui/AnimatedSection";
+import DemoIntro from "../components/propietario/DemoIntro";
 
 export default function PropietarioDashboard() {
   const [data, setData] = useState(null);
@@ -67,72 +72,32 @@ export default function PropietarioDashboard() {
   return (
     <AppLayout>
       <div className="p-6 space-y-10 text-white">
+        <AnimatedSection delay={0}>
+          <DemoIntro />
+        </AnimatedSection>
         {/*  Bienvenida */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-[#0d1224] p-8 rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.4)] border border-white/10"
-        >
-          <h2 className="text-4xl font-bold tracking-tight">
-            Hola {data.nombre} 👋
-          </h2>
-
-          <p className="mt-2 text-blue-300">
-            Unidad: Piso {data.piso ?? "-"} – Dpto {data.dpto ?? "-"}
-          </p>
-
-          <p className="mt-1 text-sm text-gray-400">
-            Resumen de liquidación:{" "}
-            <span className="text-white font-medium">{periodoLabel}</span>
-          </p>
-
-          <p
-            className={`mt-3 text-lg font-semibold ${
-              estado === "al_dia" ? "text-green-400" : "text-red-400"
-            }`}
-          >
-            {estado === "al_dia"
-              ? "Estás al día ✔️"
-              : `Debés $${montoPendiente.toLocaleString("es-AR")}`}
-          </p>
-
-          <span
-            className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold border
-    ${
-      estadoPago === "Pagada"
-        ? "bg-green-900/40 text-green-400 border-green-700/40"
-        : estadoPago === "Pago parcial"
-          ? "bg-yellow-900/40 text-yellow-300 border-yellow-700/40"
-          : "bg-red-900/40 text-red-400 border-red-700/40"
-    }`}
-          >
-            {estadoPago}
-          </span>
-        </motion.div>
-
-        {/*  Tarjetas Principales */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <p className="text-sm text-blue-300">Expensa total</p>
-            <h2 className="text-3xl font-bold mt-2">
-              ${expensaActual.toLocaleString("es-AR")}
-            </h2>
-          </Card>
-
-          <Card>
-            <p className="text-sm text-green-300">Pagado</p>
-            <h2 className="text-3xl font-bold mt-2 text-green-400">
-              ${montoPagado.toLocaleString("es-AR")}
-            </h2>
-          </Card>
-
-          <Card>
-            <p className="text-sm text-red-300">Pendiente</p>
-            <h2 className="text-3xl font-bold mt-2 text-red-400">
-              ${montoPendiente.toLocaleString("es-AR")}
-            </h2>
-          </Card>
-        </div>
+        <AnimatedSection delay={0}>
+          <InicioHeader
+            nombre={data.nombre}
+            piso={data.piso}
+            dpto={data.dpto}
+            periodo={periodoLabel}
+            estado={estado}
+            estadoPago={estadoPago}
+            montoPendiente={montoPendiente}
+          />
+        </AnimatedSection>
+        <AnimatedSection delay={0.1}>
+          <EstadoUnidad
+            estado={estado}
+            expensaActual={expensaActual}
+            montoPagado={montoPagado}
+            montoPendiente={montoPendiente}
+          />
+        </AnimatedSection>
+        <AnimatedSection delay={0.2}>
+          <AccionesRapidas />
+        </AnimatedSection>
       </div>
     </AppLayout>
   );
