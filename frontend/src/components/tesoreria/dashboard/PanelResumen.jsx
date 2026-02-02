@@ -28,9 +28,9 @@ export default function PanelResumen({
 
       {/* 📅 Meses abiertos */}
       <ResumenCard
-        titulo="Liquidaciones abiertas"
+        titulo="Liquidaciones a cerrar"
         valor={liquidacionesAbiertas}
-        subtitulo="Meses sin cerrar"
+        subtitulo="Meses pendientes de cierre"
         color="cyan"
       />
 

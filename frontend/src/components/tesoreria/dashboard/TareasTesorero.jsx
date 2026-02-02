@@ -1,30 +1,28 @@
 export default function TareasTesorero({
   tieneLiquidacionMes,
+  estadoLiquidacionMes,
   pagosPendientes,
   movimientosPendientes,
 }) {
   const tareas = [
     {
       label: "Generar liquidación del mes",
-      done: tieneLiquidacionMes,
-      tipo: "liquidacion",
+      done: Boolean(tieneLiquidacionMes),
     },
     {
       label: "Registrar pagos pendientes",
       done: pagosPendientes === 0,
-      tipo: "pagos",
     },
     {
       label: "Revisar movimientos",
       done: !movimientosPendientes,
-      tipo: "movimientos",
     },
     {
       label: "Exportar PDF del mes",
-      done: false, // se activa cuando esté cerrada
-      tipo: "pdf",
+      done: estadoLiquidacionMes === "CERRADA",
     },
   ];
+
 
   return (
     <div

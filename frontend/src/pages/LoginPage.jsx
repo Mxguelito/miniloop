@@ -6,33 +6,39 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
-
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    const res = await login(email, password);
-    if (!res.ok) {
-      setError(res.message);
-      return;
+    try {
+      const res = await login(email, password);
+
+      if (!res.ok) {
+        setError(res.message);
+        setLoading(false);
+        return;
+      }
+
+      if (res.user.role === "ADMIN") navigate("/admin");
+      else if (res.user.role === "TESORERO") navigate("/tesorero");
+      else if (res.user.role === "PROPIETARIO") navigate("/propietario");
+      else if (res.user.role === "INQUILINO") navigate("/inquilino");
+      else navigate("/");
+    } catch (err) {
+      setError("Error de conexión. Intentá nuevamente.");
+      setLoading(false);
     }
-
-    if (res.user.role === "ADMIN") navigate("/admin");
-    else if (res.user.role === "TESORERO") navigate("/tesorero");
-    else if (res.user.role === "PROPIETARIO") navigate("/propietario");
-    else if (res.user.role === "INQUILINO") navigate("/inquilino");
-    else navigate("/");
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0f1115] text-white px-4">
-      
       {/* WRAPPER */}
       <div className="relative w-full max-w-md">
-
         {/* VOLVER AL HOME */}
         <button
           type="button"
@@ -106,17 +112,23 @@ export default function LoginPage() {
           </button>
 
           <button
-            type="submit"
-            className="
-              w-full py-3 rounded-xl
-              bg-blue-600 hover:bg-blue-500
-              text-white font-semibold
-              transition-all
-              shadow-[0_0_20px_rgba(59,130,246,0.4)]
-            "
-          >
-            Entrar
-          </button>
+  type="submit"
+  disabled={loading}
+  className={`
+    w-full py-3 rounded-xl
+    text-white font-semibold
+    transition-all
+    shadow-[0_0_20px_rgba(59,130,246,0.4)]
+    ${
+      loading
+        ? "bg-blue-400 cursor-not-allowed opacity-70"
+        : "bg-blue-600 hover:bg-blue-500"
+    }
+  `}
+>
+  {loading ? "Ingresando..." : "Entrar"}
+</button>
+
 
           <p className="mt-4 text-sm text-center text-slate-300">
             ¿No tenés cuenta?{" "}
@@ -126,6 +138,17 @@ export default function LoginPage() {
           </p>
         </form>
       </div>
+      {loading && (
+  <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin" />
+      <p className="text-blue-300 text-sm">
+        Verificando credenciales…
+      </p>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

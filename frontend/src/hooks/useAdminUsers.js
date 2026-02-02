@@ -36,6 +36,22 @@ async function editarUsuario(id, data) {
   await axiosInstance.patch(`/admin/usuarios/${id}`, data);
   loadUsers();
 }
+async function desactivar(id) {
+  try {
+    await axiosInstance.patch(`/admin/usuarios/${id}/deactivate`);
+
+    setUsers((prev) =>
+      prev.map((u) =>
+        u.id === id ? { ...u, estado: "inactive" } : u
+      )
+    );
+  } catch (err) {
+    alert(
+      err.response?.data?.message || "Error al desactivar usuario"
+    );
+  }
+}
+
 
 
   useEffect(() => {
@@ -48,5 +64,6 @@ async function editarUsuario(id, data) {
     rechazar,
     eliminar,
     editarUsuario,
+    desactivar,
   };
 }

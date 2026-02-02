@@ -125,6 +125,12 @@ export default function LiquidacionesPage() {
     });
   });
 
+  function normalizeEstado(estado) {
+    return String(estado || "")
+      .trim()
+      .toUpperCase();
+  }
+
   // Ordenar de mayor a menor deuda
   deudores.sort((a, b) => b.monto - a.monto);
   console.log("📊 Deudores detectados:", deudores);
@@ -238,37 +244,45 @@ export default function LiquidacionesPage() {
 
                     {/* Estado */}
                     <td className="px-6 py-4">
-                      {l.estado === "Borrador" ? (
-                        <span
-                          className="
-        inline-flex items-center gap-2
-        px-4 py-1.5
-        rounded-full
-        text-xs font-semibold
-        bg-yellow-500/20
-        text-yellow-300
-        border border-yellow-500/30
-        shadow-[0_0_15px_rgba(255,200,0,0.25)]
-      "
-                        >
-                          🟡 Borrador
-                        </span>
-                      ) : (
-                        <span
-                          className="
-        inline-flex items-center gap-2
-        px-4 py-1.5
-        rounded-full
-        text-xs font-semibold
-        bg-green-500/20
-        text-green-400
-        border border-green-500/30
-        shadow-[0_0_18px_rgba(0,255,150,0.35)]
-      "
-                        >
-                          🟢 Cerrada
-                        </span>
-                      )}
+                      {(() => {
+                        const estado = normalizeEstado(l.estado);
+
+                        if (estado === "BORRADOR") {
+                          return (
+                            <span
+                              className="
+            inline-flex items-center gap-2
+            px-4 py-1.5
+            rounded-full
+            text-xs font-semibold
+            bg-yellow-500/20
+            text-yellow-300
+            border border-yellow-500/30
+            shadow-[0_0_15px_rgba(255,200,0,0.25)]
+          "
+                            >
+                              🟡 Borrador
+                            </span>
+                          );
+                        }
+
+                        return (
+                          <span
+                            className="
+          inline-flex items-center gap-2
+          px-4 py-1.5
+          rounded-full
+          text-xs font-semibold
+          bg-green-500/20
+          text-green-400
+          border border-green-500/30
+          shadow-[0_0_18px_rgba(0,255,150,0.35)]
+        "
+                          >
+                            🟢 Cerrada
+                          </span>
+                        );
+                      })()}
                     </td>
 
                     {/* Acciones */}

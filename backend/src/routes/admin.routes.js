@@ -7,7 +7,8 @@ import {
   updateUser,
   getSolicitudesUnidadPendientes,
   aprobarSolicitudUnidad,
-  rechazarSolicitudUnidad, 
+  rechazarSolicitudUnidad,
+  deactivateUser, 
 } from "../controllers/admin.controller.js";
 import { authRequired } from "../middleware/auth.js";
 
@@ -22,6 +23,7 @@ router.patch("/usuarios/:id", updateUser);
 router.get("/solicitudes-unidad", authRequired, getSolicitudesUnidadPendientes);
 router.patch("/solicitudes-unidad/:id/aprobar", authRequired, aprobarSolicitudUnidad);
 router.patch("/solicitudes-unidad/:id/rechazar", authRequired, rechazarSolicitudUnidad);
+router.patch("/usuarios/:id/deactivate", authRequired, deactivateUser);
 
 
 

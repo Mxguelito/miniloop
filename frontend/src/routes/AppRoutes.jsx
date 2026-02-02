@@ -5,7 +5,7 @@ import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import AdminUsuariosPage from "../pages/AdminUsuariosPage";
 import AdminPage from "../pages/AdminPage";
-import DashboardPage from "../pages/DashboardPage";
+import AppHomePage from "../pages/AppHomePage";
 import ProtectedRoute from "./ProtectedRoute";
 import UserPage from "../pages/UserPage";
 import ConsorciosPage from "../pages/ConsorciosPage";
@@ -51,7 +51,7 @@ export default function AppRoutes() {
            path="/dashboard"
           element={
           <ProtectedRoute>
-           <DashboardPage />
+           <AppHomePage />
            </ProtectedRoute>
              }
             />

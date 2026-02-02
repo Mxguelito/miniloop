@@ -1,3 +1,8 @@
+
+
+
+
+
 -- =========================
 -- 001_init.sql
 -- Migración base MiniLoop

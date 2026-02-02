@@ -78,67 +78,62 @@ export async function rejectUser(req, res) {
 }
 
 // BORRAR USUARIO (BORRADO FÍSICO COMPLETO)
+// BORRAR USUARIO (BORRADO FÍSICO DEFINITIVO CON CASCADA)
 export async function deleteUser(req, res) {
   const { id } = req.params;
 
   try {
-    //  Buscar usuario
+    // 1️⃣ Buscar usuario
     const userRes = await pool.query(
-      "SELECT * FROM usuarios WHERE id = $1",
+      "SELECT id, role, estado FROM usuarios WHERE id = $1",
       [id]
     );
 
     if (userRes.rowCount === 0) {
-      return res.status(404).json({ message: "Usuario no encontrado." });
+      return res.status(404).json({
+        message: "Usuario no encontrado."
+      });
     }
 
-   
     const user = userRes.rows[0];
 
-  
-
-    // No permitir borrar usuarios activos
-    if (user.estado === "active") {
-      return res.status(400).json({
-        message: "No se puede borrar un usuario activo."
-      });
-    }
-
-    // No permitir borrar ADMIN
+    // 2️⃣ No permitir borrar ADMIN
     if (user.role === "ADMIN") {
       return res.status(400).json({
-        message: "No se puede borrar un administrador."
+        message: "No se puede eliminar un administrador."
       });
     }
 
-    //  Borrar según rol
-    if (user.role === "PROPIETARIO") {
-      await pool.query(
-        "DELETE FROM propietarios WHERE usuario_id = $1",
-        [id]
-      );
+    // 3️⃣ No permitir borrar usuarios activos
+    if (user.estado === "active") {
+      return res.status(400).json({
+        message: "No se puede eliminar un usuario activo."
+      });
     }
 
-    if (user.role === "INQUILINO") {
-      await pool.query(
-        "DELETE FROM inquilinos WHERE usuario_id = $1",
-        [id]
-      );
-    }
-
-    //  Borrar usuario base
+    // 4️⃣ BORRADO REAL
+    // ⚠️ Gracias a ON DELETE CASCADE:
+    // - propietarios
+    // - inquilinos
+    // - futuras tablas relacionadas
+    // se eliminan solas
     await pool.query(
       "DELETE FROM usuarios WHERE id = $1",
       [id]
     );
 
-    res.json({ message: "Usuario eliminado completamente." });
+    return res.json({
+      message: "Usuario eliminado definitivamente."
+    });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Error eliminando usuario." });
+    console.error("❌ Error eliminando usuario:", err);
+    return res.status(500).json({
+      message: "Error interno al eliminar usuario."
+    });
   }
 }
+
 // EDITAR USUARIO ACTIVO (nombre / email)
 export async function updateUser(req, res) {
   const { id } = req.params;
@@ -179,6 +174,47 @@ export async function updateUser(req, res) {
     res.status(500).json({ message: "Error al editar usuario" });
   }
 }
+// DESACTIVAR USUARIO (OCULTAR SIN BORRAR)
+export async function deactivateUser(req, res) {
+  const { id } = req.params;
+
+  try {
+    const userRes = await pool.query(
+      "SELECT id, role, estado FROM usuarios WHERE id = $1",
+      [id]
+    );
+
+    if (userRes.rowCount === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado." });
+    }
+
+    const user = userRes.rows[0];
+
+    if (user.role === "ADMIN") {
+      return res.status(400).json({
+        message: "No se puede desactivar un administrador."
+      });
+    }
+
+    if (user.estado !== "active") {
+      return res.status(400).json({
+        message: "El usuario ya está desactivado."
+      });
+    }
+
+    await pool.query(
+      "UPDATE usuarios SET estado = 'inactive' WHERE id = $1",
+      [id]
+    );
+
+    res.json({ message: "Usuario desactivado correctamente." });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error desactivando usuario." });
+  }
+}
+
 // OBTENER SOLICITUDES DE UNIDAD PENDIENTES
 
 export async function getSolicitudesUnidadPendientes(req, res) {
