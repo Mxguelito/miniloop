@@ -6,7 +6,7 @@ export default function AppLayout({ children }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-[#0b1220] to-[#0f172a] text-slate-100 overflow-hidden">
+    <div className="min-h-screen flex bg-gradient-to-br from-[#0b1220] to-[#0f172a] text-slate-100">
       {/* Sidebar Desktop */}
       <Sidebar />
 
@@ -68,7 +68,7 @@ export default function AppLayout({ children }) {
       {/* Contenido principal */}
       <div className="flex-1 flex flex-col relative z-0">
         <Topbar onOpenMenu={() => setOpen(true)} />
-        <main className="flex-1 p-4 md:p-8">{children}</main>
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto">{children}</main>
       </div>
 
       {/* Animación */}

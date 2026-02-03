@@ -73,10 +73,13 @@ export default function LiquidacionesPage() {
   }
 
   // Filtrar por año
-  const filteredItems =
-    yearFilter === "todos"
-      ? items
-      : items.filter((l) => String(l.anio) === String(yearFilter));
+  const yearsDisponibles = items.map((l) => String(l.anio));
+
+const filteredItems =
+  yearFilter === "todos" || !yearsDisponibles.includes(String(yearFilter))
+    ? items
+    : items.filter((l) => String(l.anio) === String(yearFilter));
+
 
   //  Calcular totales en tiempo real
   const saldoTotal = filteredItems.reduce(
