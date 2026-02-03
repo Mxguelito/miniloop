@@ -34,27 +34,24 @@ export default function MiUnidadPage() {
   }
 
   return (
-    <AppLayout>
-      <MiUnidadLayout>
-        {/* Header simple */}
-        <PageHeader
-          title="Mi Unidad"
-          subtitle="Información del propietario y su unidad"
-          role="PROPIETARIO"
-        />
+  <AppLayout>
+    <div className="p-4 space-y-6">
+      <PageHeader
+        title="Mi Unidad"
+        subtitle="Información del propietario y su unidad"
+        role="PROPIETARIO"
+      />
 
-        {/* Info */}
-        <MiUnidadInfo data={data} />
+      <MiUnidadInfo data={data} />
 
-        {/* Estado */}
-        <MiUnidadEstado montoPendiente={data.montoPendiente} />
+      <MiUnidadEstado montoPendiente={data.montoPendiente} />
 
-        {/* Acciones */}
-        <MiUnidadAcciones
-          onEditarTelefono={editarTelefono}
-          onSolicitarCambioUnidad={solicitarCambioUnidad}
-        />
-      </MiUnidadLayout>
-    </AppLayout>
-  );
+      <MiUnidadAcciones
+        onEditarTelefono={editarTelefono}
+        onSolicitarCambioUnidad={solicitarCambioUnidad}
+      />
+    </div>
+  </AppLayout>
+);
+
 }
