@@ -4,14 +4,11 @@ import { useNavigate } from "react-router-dom";
 import {
   getLiquidaciones,
   deleteLiquidacion,
-  formatMoney,
 } from "../services/liquidacionesService";
 
 import LiquidacionesHeader from "../components/tesoreria/LiquidacionesHeader";
 import ResumenFinanciero from "../components/tesoreria/ResumenFinanciero";
 import LiquidacionesCards from "../components/tesoreria/LiquidacionesCards";
-import EvolucionSaldoChart from "../components/tesoreria/EvolucionSaldoChart";
-import RankingDeudores from "../components/tesoreria/RankingDeudores";
 
 import { getLiquidacion } from "../services/liquidacionesService";
 import { exportLiquidacionPDF } from "../utils/exportLiquidacionPDF";
@@ -38,11 +35,8 @@ export default function LiquidacionesPage() {
   }, []);
 
   // ===== FILTRO SEGURO =====
-  const yearsDisponibles = items.map((l) => String(l.anio));
-
   const filteredItems =
-    yearFilter === "todos" ||
-    !yearsDisponibles.includes(String(yearFilter))
+    yearFilter === "todos"
       ? items
       : items.filter((l) => String(l.anio) === String(yearFilter));
 
@@ -77,8 +71,9 @@ export default function LiquidacionesPage() {
     }
   }
 
-  return (
-    <AppLayout>
+ return (
+  <AppLayout>
+    <div className="max-w-2xl mx-auto px-4 pb-24 space-y-6">
       {/* HEADER */}
       <LiquidacionesHeader
         yearFilter={yearFilter}
@@ -86,39 +81,34 @@ export default function LiquidacionesPage() {
         onNueva={handleNueva}
       />
 
-      {/* ===== RESUMEN (SIEMPRE) ===== */}
-      <ResumenFinanciero saldoTotal={saldoTotal} deudaTotal={deudaTotal} />
+      {/* RESUMEN */}
+      <ResumenFinanciero
+        saldoTotal={saldoTotal}
+        deudaTotal={deudaTotal}
+      />
 
-      {/* ===== MOBILE SIMPLE ===== */}
-      {!loading && filteredItems.length > 0 && (
-        <div className="block md:hidden">
-          <LiquidacionesCards
-            items={filteredItems}
-            onVer={(id) => navigate(`/liquidaciones/${id}`)}
-            onExport={handleExport}
-            onDelete={handleDelete}
-          />
-        </div>
+      {/* ESTADO */}
+      {loading && (
+        <div className="text-gray-300">Cargando liquidaciones...</div>
       )}
 
-      {/* ===== DESKTOP COMPLETO ===== */}
-      {!loading && filteredItems.length > 0 && (
-        <div className="hidden md:block space-y-10">
-          <EvolucionSaldoChart data={filteredItems} />
-          <RankingDeudores deudores={[]} />
-        </div>
-      )}
-
-      {/* ===== EMPTY ===== */}
       {!loading && filteredItems.length === 0 && (
         <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4 text-gray-300">
           No hay liquidaciones creadas aún.
         </div>
       )}
 
-      {loading && (
-        <div className="text-gray-300">Cargando liquidaciones...</div>
+      {/* LISTADO MOBILE / GENERAL */}
+      {!loading && filteredItems.length > 0 && (
+        <LiquidacionesCards
+          items={filteredItems}
+          onVer={(id) => navigate(`/liquidaciones/${id}`)}
+          onExport={handleExport}
+          onDelete={handleDelete}
+        />
       )}
-    </AppLayout>
-  );
+    </div>
+  </AppLayout>
+);
+
 }
