@@ -1,4 +1,4 @@
--- 003_usuarios_soft_delete_y_cascade.sql
+-- 002_usuarios_soft_delete_y_cascade.sql
 
 -- Asegurar columna estado en usuarios
 ALTER TABLE usuarios
