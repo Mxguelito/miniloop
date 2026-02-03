@@ -19,12 +19,12 @@ export default function MiUnidadInfo({ data }) {
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <StatBoxFuturistic label="Propietario" value={data.nombre} />
-        <StatBoxFuturistic label="Email" value={data.email} />
-        <StatBoxFuturistic label="Teléfono" value={data.telefono} />
-        <StatBoxFuturistic label="Piso" value={data.piso} />
-        <StatBoxFuturistic label="Departamento" value={data.dpto} />
-        <StatBoxFuturistic label="Unidad" value={data.unidad} />
+        <StatBoxBeige label="Propietario" value={data.nombre} />
+        <StatBoxBeige label="Email" value={data.email} />
+        <StatBoxBeige label="Teléfono" value={data.telefono} />
+        <StatBoxBeige label="Piso" value={data.piso} />
+        <StatBoxBeige label="Departamento" value={data.dpto} />
+        <StatBoxBeige label="Unidad" value={data.unidad} />
       </div>
     </div>
   );
