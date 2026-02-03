@@ -33,9 +33,9 @@ export default function MiUnidadPage() {
     );
   }
 
-  return (
+ return (
   <AppLayout>
-    <div className="p-4 space-y-6">
+    <MiUnidadLayout>
       <PageHeader
         title="Mi Unidad"
         subtitle="Información del propietario y su unidad"
@@ -50,8 +50,9 @@ export default function MiUnidadPage() {
         onEditarTelefono={editarTelefono}
         onSolicitarCambioUnidad={solicitarCambioUnidad}
       />
-    </div>
+    </MiUnidadLayout>
   </AppLayout>
 );
+
 
 }
