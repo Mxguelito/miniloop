@@ -1,15 +1,24 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-
 // CONFIG + HELPERS
 
 const LOGO_WIDTH = 28;
 
 function monthName(m) {
   const nombres = [
-    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
   ];
   return nombres[(m ?? 1) - 1] || "";
 }
@@ -19,10 +28,9 @@ function money(n) {
   return v.toLocaleString("es-AR", {
     style: "currency",
     currency: "ARS",
-    maximumFractionDigits: 0
+    maximumFractionDigits: 0,
   });
 }
-
 
 // EXPORT PRINCIPAL
 
@@ -38,9 +46,8 @@ export function exportLiquidacionPDF(liq, opts = {}) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const topY = 36;
 
-  
-  // ENCABEZADO 
-  
+  // ENCABEZADO
+
   if (logoBase64) {
     doc.addImage(logoBase64, "PNG", 36, topY, LOGO_WIDTH, LOGO_WIDTH);
   }
@@ -64,7 +71,7 @@ export function exportLiquidacionPDF(liq, opts = {}) {
   doc.text(
     `Liquidación ${monthName(liq?.mes)} ${liq?.anio || ""}`,
     36,
-    topY + 60
+    topY + 60,
   );
 
   // Estado
@@ -80,147 +87,136 @@ export function exportLiquidacionPDF(liq, opts = {}) {
 
   let currentY = topY + 110;
 
-  
-// TABLA PROPIETARIOS
+  // TABLA PROPIETARIOS
 
+  autoTable(doc, {
+    startY: currentY,
+    head: [["Nombre", "Piso", "Dpto", "Expensa", "Abonado", "Adeudado"]],
+    body: (liq.propietarios || []).map((p) => [
+      p.nombre || "",
+      p.piso || "",
+      p.dpto ?? "-", // ✅
+      money(p.expensaMes || 0),
+      money(p.montoAbonado || 0),
+      money(p.expensaAdeudada || 0),
+    ]),
 
-autoTable(doc, {
-  startY: currentY,
-  head: [["Nombre", "Piso", "Dpto", "Expensa", "Abonado", "Adeudado"]],
-  body: (liq.propietarios || []).map((p) => [
-    p.nombre || "",
-    p.piso || "",
-    p.departamento || "",
-    money(p.expensaMes || 0),
-    money(p.montoAbonado || 0),
-    money(p.expensaAdeudada || 0),
-  ]),
+    headStyles: {
+      fillColor: themeColor,
+      textColor: 255,
+      halign: "center",
+      fontSize: 12,
+      cellPadding: 6,
+    },
 
-  headStyles: {
-    fillColor: themeColor,
-    textColor: 255,
-    halign: "center",
-    fontSize: 12,
-    cellPadding: 6,
-  },
+    bodyStyles: {
+      fontSize: 10,
+      cellPadding: 6,
+    },
 
-  bodyStyles: {
-    fontSize: 10,
-    cellPadding: 6,
-  },
+    alternateRowStyles: {
+      fillColor: [245, 245, 245],
+    },
 
-  alternateRowStyles: {
-    fillColor: [245, 245, 245],
-  },
+    didParseCell: function (data) {
+      if (data.section === "body" && data.column.index === 5) {
+        const adeuda = liq.propietarios[data.row.index]?.expensaAdeudada || 0;
 
-  didParseCell: function (data) {
-    
-    if (data.section === "body" && data.column.index === 5) {
-      const adeuda =
-        (liq.propietarios[data.row.index]?.expensaAdeudada) || 0;
-
-      if (adeuda > 0) {
-        data.cell.styles.textColor = [200, 0, 0];
-        data.cell.styles.fontStyle = "bold";
+        if (adeuda > 0) {
+          data.cell.styles.textColor = [200, 0, 0];
+          data.cell.styles.fontStyle = "bold";
+        }
       }
-    }
-  },
-});
+    },
+  });
 
-// NUEVA POSICIÓN Y
-currentY = doc.lastAutoTable.finalY + 30;
+  // NUEVA POSICIÓN Y
+  currentY = doc.lastAutoTable.finalY + 30;
 
+  // TABLA MOVIMIENTOS
 
-  
-// TABLA MOVIMIENTOS
+  autoTable(doc, {
+    startY: currentY,
+    head: [["Tipo", "Motivo", "Monto"]],
+    body: (liq.movimientos || []).map((m) => [
+      m.tipo || "",
+      m.motivo || "",
+      money(m.monto || 0),
+    ]),
 
+    headStyles: {
+      fillColor: themeColor,
+      textColor: 255,
+      halign: "center",
+      fontSize: 12,
+      cellPadding: 6,
+    },
 
-autoTable(doc, {
-  startY: currentY,
-  head: [["Tipo", "Motivo", "Monto"]],
-  body: (liq.movimientos || []).map((m) => [
-    m.tipo || "",
-    m.motivo || "",
-    money(m.monto || 0),
-  ]),
+    bodyStyles: {
+      fontSize: 10,
+      cellPadding: 6,
+    },
 
-  headStyles: {
-    fillColor: themeColor,
-    textColor: 255,
-    halign: "center",
-    fontSize: 12,
-    cellPadding: 6,
-  },
+    alternateRowStyles: {
+      fillColor: [245, 245, 245],
+    },
+  });
 
-  bodyStyles: {
-    fontSize: 10,
-    cellPadding: 6,
-  },
+  // NUEVA POSICIÓN Y
+  currentY = doc.lastAutoTable.finalY + 30;
 
-  alternateRowStyles: {
-    fillColor: [245, 245, 245],
-  },
-});
+  // TOTALES
 
-// NUEVA POSICIÓN Y
-currentY = doc.lastAutoTable.finalY + 30;
+  const T = liq.totales || {};
 
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.setTextColor(30);
+  doc.text("Totales", 36, currentY);
 
+  autoTable(doc, {
+    startY: currentY + 10,
+    head: [["Concepto", "Monto"]],
+    body: [
+      ["Ingresos expensas", money(T.ingresosExpensas)],
+      ["Ingresos extra", money(T.ingresosExtra)],
+      ["Adeudado total", money(T.adeudado)],
+      ["Gastos", money(T.gastos)],
+      ["Saldo del mes", money(T.saldoMes)],
+    ],
 
-  
-// TOTALES
+    headStyles: {
+      fillColor: themeColor,
+      textColor: 255,
+      halign: "center",
+      fontSize: 12,
+      cellPadding: 6,
+    },
 
-const T = liq.totales || {};
+    bodyStyles: {
+      fontSize: 10,
+      cellPadding: 6,
+    },
 
-doc.setFont("helvetica", "bold");
-doc.setFontSize(14);
-doc.setTextColor(30);
-doc.text("Totales", 36, currentY);
+    alternateRowStyles: {
+      fillColor: [245, 245, 245],
+    },
 
-autoTable(doc, {
-  startY: currentY + 10,
-  head: [["Concepto", "Monto"]],
-  body: [
-    ["Ingresos expensas", money(T.ingresosExpensas)],
-    ["Ingresos extra", money(T.ingresosExtra)],
-    ["Adeudado total", money(T.adeudado)],
-    ["Gastos", money(T.gastos)],
-    ["Saldo del mes", money(T.saldoMes)],
-  ],
+    columnStyles: {
+      1: { halign: "right" },
+    },
 
-  headStyles: {
-    fillColor: themeColor,
-    textColor: 255,
-    halign: "center",
-    fontSize: 12,
-    cellPadding: 6,
-  },
+    didParseCell: (d) => {
+      if (d.section === "body" && d.row.index === 4) {
+        d.cell.styles.fontStyle = "bold";
+        d.cell.styles.textColor =
+          T.saldoMes >= 0 ? [34, 197, 94] : [239, 68, 68];
+      }
+    },
+  });
 
-  bodyStyles: {
-    fontSize: 10,
-    cellPadding: 6,
-  },
-
-  alternateRowStyles: {
-    fillColor: [245, 245, 245],
-  },
-
-  columnStyles: {
-    1: { halign: "right" },
-  },
-
-  didParseCell: (d) => {
-    if (d.section === "body" && d.row.index === 4) {
-      d.cell.styles.fontStyle = "bold";
-      d.cell.styles.textColor =
-        T.saldoMes >= 0 ? [34, 197, 94] : [239, 68, 68];
-    }
-  },
-});
-
-  
   // RANKING DE DEUDORES (POR MES)
-  
+
   const deudores = [];
 
   (liq.propietarios || []).forEach((p) => {
@@ -235,7 +231,7 @@ autoTable(doc, {
         deudores.push({
           nombre: p.nombre,
           piso: p.piso || "-",
-          departamento: p.departamento || "-",
+          departamento: p.dpto || "-", // ✅
           monto: adeuda,
         });
       }
@@ -246,27 +242,22 @@ autoTable(doc, {
   deudores.sort((a, b) => b.monto - a.monto);
 
   if (deudores.length > 0) {
-   
-  
-// Más espacio arriba (35 px)
-const baseY = (doc.lastAutoTable ? doc.lastAutoTable.finalY : 90) + 35;
+    // Más espacio arriba (35 px)
+    const baseY = (doc.lastAutoTable ? doc.lastAutoTable.finalY : 90) + 35;
 
-// Título estilizado
-doc.setFont("helvetica", "bold");
-doc.setFontSize(18);
-doc.setTextColor(255, 0, 85);
-doc.text("Ranking de Deudores", pageWidth / 2, baseY, { align: "center" });
+    // Título estilizado
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(255, 0, 85);
+    doc.text("Ranking de Deudores", pageWidth / 2, baseY, { align: "center" });
 
-// Línea glow centrada
-doc.setDrawColor(255, 0, 85);
-doc.setLineWidth(1);
-doc.line(pageWidth / 2 - 60, baseY + 4, pageWidth / 2 + 60, baseY + 4);
+    // Línea glow centrada
+    doc.setDrawColor(255, 0, 85);
+    doc.setLineWidth(1);
+    doc.line(pageWidth / 2 - 60, baseY + 4, pageWidth / 2 + 60, baseY + 4);
 
-// Nuevo espacio para comenzar la tabla
-const startY = baseY + 18;
-
-
-
+    // Nuevo espacio para comenzar la tabla
+    const startY = baseY + 18;
 
     const body = deudores.map((d, index) => [
       index + 1,
@@ -275,53 +266,49 @@ const startY = baseY + 18;
       `\$ ${d.monto.toLocaleString("es-AR")}`,
     ]);
 
-   autoTable(doc, {
-  startY,
-  head: [["#", "Propietario", "Unidad", "Deuda"]],
-  body,
+    autoTable(doc, {
+      startY,
+      head: [["#", "Propietario", "Unidad", "Deuda"]],
+      body,
 
-  //  Estilo general Tesla
-  theme: "grid",
-  // Centrado de tabla
-tableWidth: 220,
-margin: { left: (pageWidth - 220) / 2 },
+      //  Estilo general Tesla
+      theme: "grid",
+      // Centrado de tabla
+      tableWidth: 220,
+      margin: { left: (pageWidth - 220) / 2 },
 
+      styles: {
+        fontSize: 10,
+        cellPadding: 4,
+      },
 
-  styles: {
-    fontSize: 10,
-    cellPadding: 4,
-  },
+      headStyles: {
+        fillColor: [255, 0, 85], // Rosa Tesla fuerte
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+        halign: "center",
+      },
 
-  headStyles: {
-    fillColor: [255, 0, 85], // Rosa Tesla fuerte
-    textColor: [255, 255, 255],
-    fontStyle: "bold",
-    halign: "center",
-  },
+      bodyStyles: {
+        halign: "center",
+      },
 
-  bodyStyles: {
-    halign: "center",
-  },
+      // Filas alternadas en rosa muy suave
+      alternateRowStyles: {
+        fillColor: [255, 235, 241],
+      },
 
-  // Filas alternadas en rosa muy suave
-  alternateRowStyles: {
-    fillColor: [255, 235, 241],
-  },
-
-  // Ancho de columnas prolijo
-  columnStyles: {
-    0: { cellWidth: 12 },  // #
-    1: { cellWidth: 90 },  // Propietario
-    2: { cellWidth: 50 },  // Unidad
-    3: { cellWidth: 60 },  // Deuda
-  },
-});
-
+      // Ancho de columnas prolijo
+      columnStyles: {
+        0: { cellWidth: 12 }, // #
+        1: { cellWidth: 90 }, // Propietario
+        2: { cellWidth: 50 }, // Unidad
+        3: { cellWidth: 60 }, // Deuda
+      },
+    });
   }
 
-
-  
   // GUARDAR ARCHIVO
-  
+
   doc.save(`Liquidacion_${monthName(liq.mes)}_${liq.anio}.pdf`);
 }

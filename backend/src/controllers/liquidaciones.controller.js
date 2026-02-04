@@ -128,6 +128,23 @@ export async function update(req, res) {
     const { id } = req.params;
     const { propietarios = [], movimientos = [], estado = "BORRADOR" } = req.body;
 
+    // 🔒 BLOQUEO: no permitir modificar liquidaciones cerradas
+    const estadoActual = await pool.query(
+      `SELECT estado FROM liquidaciones WHERE id = $1`,
+      [id]
+    );
+
+    if (estadoActual.rowCount === 0) {
+      return res.status(404).json({ error: "Liquidación no encontrada" });
+    }
+
+    if (estadoActual.rows[0].estado === "CERRADA") {
+      return res.status(403).json({
+        error: "La liquidación está cerrada y no puede modificarse",
+      });
+    }
+
+    // ✅ A PARTIR DE ACÁ recién se permite modificar
     await pool.query(
       `UPDATE liquidaciones SET estado = $1 WHERE id = $2`,
       [estado, id]
@@ -142,7 +159,10 @@ export async function update(req, res) {
       );
     }
 
-    await pool.query(`DELETE FROM movimientos WHERE liquidacion_id = $1`, [id]);
+    await pool.query(
+      `DELETE FROM movimientos WHERE liquidacion_id = $1`,
+      [id]
+    );
 
     for (const m of movimientos) {
       await pool.query(
@@ -158,5 +178,42 @@ export async function update(req, res) {
   } catch (err) {
     console.error("❌ Error UPDATE:", err);
     res.status(500).json({ error: "Error al actualizar" });
+  }
+}
+
+// ===============================
+// DELETE /api/liquidaciones/:id
+// ===============================
+export async function remove(req, res) {
+  try {
+    const { id } = req.params;
+
+    // borrar movimientos primero (FK)
+    await pool.query(
+      `DELETE FROM movimientos WHERE liquidacion_id = $1`,
+      [id]
+    );
+
+    // borrar saldos
+    await pool.query(
+      `DELETE FROM saldos WHERE liquidacion_id = $1`,
+      [id]
+    );
+
+    // borrar liquidación
+    const result = await pool.query(
+      `DELETE FROM liquidaciones WHERE id = $1 RETURNING *`,
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Liquidación no encontrada" });
+    }
+
+    res.json({ message: "Liquidación eliminada correctamente" });
+
+  } catch (err) {
+    console.error("❌ Error DELETE liquidación:", err);
+    res.status(500).json({ error: "Error al eliminar liquidación" });
   }
 }

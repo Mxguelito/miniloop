@@ -3,6 +3,7 @@ export default function LiquidacionMovimientos({
   onAddMovimiento,
   onUpdateMovimiento,
   onDeleteMovimiento,
+  isCerrada,
 }) {
   return (
     <div className="mb-20">
@@ -12,29 +13,27 @@ export default function LiquidacionMovimientos({
           Movimientos
         </h2>
 
-        <div className="flex gap-3">
-          <button
-            onClick={() => onAddMovimiento("ingreso")}
-            className="
-              px-4 py-2 rounded-xl text-sm font-semibold
-              bg-green-600 hover:bg-green-700
-              text-white shadow-lg transition
-            "
-          >
-            + Ingreso
-          </button>
+        {!isCerrada && (
+          <div className="flex gap-3">
+            <button
+              onClick={() => onAddMovimiento("ingreso")}
+              className="px-4 py-2 rounded-xl text-sm font-semibold
+                 bg-green-600 hover:bg-green-700
+                 text-white shadow-lg transition"
+            >
+              + Ingreso
+            </button>
 
-          <button
-            onClick={() => onAddMovimiento("gasto")}
-            className="
-              px-4 py-2 rounded-xl text-sm font-semibold
-              bg-red-600 hover:bg-red-700
-              text-white shadow-lg transition
-            "
-          >
-            + Gasto
-          </button>
-        </div>
+            <button
+              onClick={() => onAddMovimiento("gasto")}
+              className="px-4 py-2 rounded-xl text-sm font-semibold
+                 bg-red-600 hover:bg-red-700
+                 text-white shadow-lg transition"
+            >
+              + Gasto
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Timeline */}
@@ -78,12 +77,14 @@ export default function LiquidacionMovimientos({
                     {ingreso ? "Ingreso" : "Gasto"}
                   </h3>
 
-                  <button
-                    onClick={() => onDeleteMovimiento(m.id)}
-                    className="text-gray-400 hover:text-red-400 transition text-lg"
-                  >
-                    ✕
-                  </button>
+                  {!isCerrada && (
+                    <button
+                      onClick={() => onDeleteMovimiento(m.id)}
+                      className="text-gray-400 hover:text-red-400 transition text-lg"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
 
                 {/* Campos */}
@@ -93,6 +94,7 @@ export default function LiquidacionMovimientos({
                     <label className="text-xs text-gray-400">Motivo</label>
                     <input
                       value={m.motivo || ""}
+                      disabled={isCerrada}
                       onChange={(e) =>
                         onUpdateMovimiento(m.id, "motivo", e.target.value)
                       }
@@ -111,6 +113,7 @@ export default function LiquidacionMovimientos({
                     <input
                       type="number"
                       value={m.monto ?? 0}
+                      disabled={isCerrada}
                       onChange={(e) =>
                         onUpdateMovimiento(
                           m.id,

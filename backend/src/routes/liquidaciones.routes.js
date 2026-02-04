@@ -6,6 +6,7 @@ import {
   getById,
   crearLiquidacion,
   update,
+  remove,
 } from "../controllers/liquidaciones.controller.js";
 
 const router = Router();
@@ -17,5 +18,6 @@ router.get("/", getAll);
 router.get("/:id", getById);
 router.post("/", crearLiquidacion);
 router.put("/:id", update);
+router.delete("/:id", remove);
 
 export default router;

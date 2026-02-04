@@ -63,6 +63,20 @@ export default function LiquidacionHeader({
             </span>
           </div>
         </div>
+        {/* MENSAJE SOLO LECTURA */}
+        {cerrada && (
+          <div
+            className="
+      mt-2 px-4 py-2 rounded-xl
+      bg-red-500/10 border border-red-500/30
+      text-red-300 text-sm font-medium
+      flex items-center gap-2
+      max-w-fit
+    "
+          >
+            🔒 La liquidación está cerrada y no admite cambios
+          </div>
+        )}
 
         {/* ACCIONES */}
         <div className="flex flex-wrap gap-3">

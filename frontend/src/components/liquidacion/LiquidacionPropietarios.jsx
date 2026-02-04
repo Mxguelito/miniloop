@@ -2,6 +2,7 @@ export default function LiquidacionPropietarios({
   propietarios = [],
   onUpdatePropietario,
   onRegistrarPago,
+  isCerrada,
 }) {
   return (
     <div className="mb-16">
@@ -71,12 +72,11 @@ export default function LiquidacionPropietarios({
                 {/* Inputs */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-gray-400">
-                      Expensa
-                    </label>
+                    <label className="text-xs text-gray-400">Expensa</label>
                     <input
                       type="number"
                       value={p.expensaMes ?? 0}
+                      disabled={isCerrada}
                       onChange={(e) =>
                         onUpdatePropietario(
                           p.id,
@@ -94,9 +94,7 @@ export default function LiquidacionPropietarios({
                   </div>
 
                   <div>
-                    <label className="text-xs text-gray-400">
-                      Pagó
-                    </label>
+                    <label className="text-xs text-gray-400">Pagó</label>
                     <input
                       type="number"
                       value={p.montoAbonado ?? 0}
@@ -132,16 +130,18 @@ export default function LiquidacionPropietarios({
                 </div>
 
                 {/* Acción */}
-                <button
-                  onClick={() => onRegistrarPago(p)}
-                  className="
-                    mt-2 px-4 py-2 rounded-xl text-sm font-semibold
-                    bg-cyan-600 hover:bg-cyan-700
-                    text-white shadow-lg transition
-                  "
-                >
-                  Registrar pago
-                </button>
+                {!isCerrada && (
+                  <button
+                    onClick={() => onRegistrarPago(p)}
+                    className="
+      mt-2 px-4 py-2 rounded-xl text-sm font-semibold
+      bg-cyan-600 hover:bg-cyan-700
+      text-white shadow-lg transition
+    "
+                  >
+                    Registrar pago
+                  </button>
+                )}
               </div>
             </div>
           );
