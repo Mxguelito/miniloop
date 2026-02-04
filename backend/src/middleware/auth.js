@@ -1,4 +1,3 @@
-
 import jwt from "jsonwebtoken";
 
 export function authRequired(req, res, next) {
@@ -15,14 +14,13 @@ export function authRequired(req, res, next) {
       return res.status(401).json({ message: "Invalid token format" });
     }
 
-    const decoded = jwt.verify(token, "miniloop_secret");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     req.user = decoded; // { id, role, email }
 
     next();
-
   } catch (err) {
-    console.log("Auth error:", err);
+    console.error("❌ Auth error:", err.message);
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 }
