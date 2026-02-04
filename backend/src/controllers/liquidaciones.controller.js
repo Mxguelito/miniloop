@@ -85,14 +85,15 @@ export async function crearLiquidacion(req, res) {
 
     // 🔐 Consorcio desde el usuario logueado
     const { rows } = await pool.query(
-      "SELECT consorcio_id FROM usuarios WHERE id = $1",
-      [req.user.id]
-    );
+  "SELECT consorcio_id FROM usuarios WHERE id = $1",
+  [req.user.id]
+);
 
-    const consorcio_id = rows[0]?.consorcio_id;
-    if (!consorcio_id) {
-      return res.status(400).json({ error: "Usuario sin consorcio asignado" });
-    }
+// 👉 si no hay consorcio, usamos uno default
+const consorcio_id = rows[0]?.consorcio_id ?? DEFAULT_CONSORCIO_ID;
+
+
+    
 
     // 1️⃣ Crear liquidación VACÍA
     const result = await pool.query(
