@@ -82,9 +82,22 @@ export async function getById(req, res) {
 
 export const crearLiquidacion = async (req, res) => {
   try {
-    let { mes, anio, consorcioId, monto_expensa } = req.body;
+    const { mes, anio, monto_expensa = 0 } = req.body;
 
-    const consorcio_id = consorcioId;
+    // 🔒 OBTENER CONSORCIO DESDE EL USUARIO (ROBUSTO)
+    const { rows } = await pool.query(
+      "SELECT consorcio_id FROM usuarios WHERE id = $1",
+      [req.user.id]
+    );
+
+    const consorcio_id = rows[0]?.consorcio_id;
+
+    if (!consorcio_id) {
+      return res.status(400).json({
+        error: "El usuario no tiene consorcio asignado",
+      });
+    }
+
 
     // 1) Crear liquidación
     const result = await pool.query(
