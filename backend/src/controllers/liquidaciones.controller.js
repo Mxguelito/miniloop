@@ -83,39 +83,30 @@ export async function crearLiquidacion(req, res) {
   try {
     const { mes, anio } = req.body;
 
-    // 🔐 Consorcio desde el usuario logueado
-    const { rows } = await pool.query(
-  "SELECT consorcio_id FROM usuarios WHERE id = $1",
-  [req.user.id]
-);
-
-// 👉 si no hay consorcio, usamos uno default
-const consorcio_id = rows[0]?.consorcio_id ?? DEFAULT_CONSORCIO_ID;
-
-
-    
-
-    // 1️⃣ Crear liquidación VACÍA
+    // 1️⃣ Crear liquidación SIN consorcio
     const result = await pool.query(
-      `INSERT INTO liquidaciones (mes, anio, consorcio_id, estado)
-       VALUES ($1, $2, $3, 'BORRADOR')
-       RETURNING *`,
-      [mes, anio, consorcio_id]
+      `
+      INSERT INTO liquidaciones (mes, anio, estado)
+      VALUES ($1, $2, 'BORRADOR')
+      RETURNING *
+      `,
+      [mes, anio]
     );
 
     const liquidacion = result.rows[0];
 
-    // 2️⃣ Crear saldos en 0 para cada propietario
+    // 2️⃣ Traer TODOS los propietarios (modo single-consorcio)
     const propietarios = await pool.query(
-      `SELECT id, piso, dpto FROM propietarios WHERE consorcio_id = $1`,
-      [consorcio_id]
+      `SELECT id, piso, dpto FROM propietarios`
     );
 
     for (const p of propietarios.rows) {
       await pool.query(
-        `INSERT INTO saldos 
-         (propietario_id, liquidacion_id, monto_expensa, monto_pagado, piso, dpto)
-         VALUES ($1, $2, 0, 0, $3, $4)`,
+        `
+        INSERT INTO saldos 
+        (propietario_id, liquidacion_id, monto_expensa, monto_pagado, piso, dpto)
+        VALUES ($1, $2, 0, 0, $3, $4)
+        `,
         [p.id, liquidacion.id, p.piso, p.dpto]
       );
     }
@@ -124,9 +115,10 @@ const consorcio_id = rows[0]?.consorcio_id ?? DEFAULT_CONSORCIO_ID;
 
   } catch (err) {
     console.error("❌ Error CREAR LIQUIDACIÓN:", err);
-    res.status(500).json({ error: "Error al crear liquidación" });
+    res.status(500).json({ error: err.message });
   }
 }
+
 
 // ===============================
 // PUT /api/liquidaciones/:id
