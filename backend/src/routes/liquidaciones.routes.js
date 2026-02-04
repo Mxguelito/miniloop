@@ -1,23 +1,26 @@
 import { Router } from "express";
-import { 
-  getAll, 
-  getById, 
-  crearLiquidacion,
-  update
-} from "../controllers/liquidaciones.controller.js";
-import { eliminar } from "../controllers/liquidaciones.controller.js";
-import { fullUpdate } from "../controllers/liquidaciones.controller.js";
+import { authRequired } from "../middleware/auth.js";
 
+
+import {
+  getAll,
+  getById,
+  crearLiquidacion,
+  update,
+  eliminar,
+  fullUpdate,
+} from "../controllers/liquidaciones.controller.js";
 
 const router = Router();
+
+// 🔐 PROTEGER TODAS LAS RUTAS
+router.use(authRequired);
 
 router.get("/", getAll);
 router.get("/:id", getById);
 router.post("/", crearLiquidacion);
 router.put("/:id", update);
-
-router.delete("/:id", eliminar);
 router.put("/:id/full-update", fullUpdate);
-
+router.delete("/:id", eliminar);
 
 export default router;
