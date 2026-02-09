@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 export default function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     nombre: "",
@@ -24,12 +25,15 @@ export default function RegisterPage() {
     e.preventDefault();
     setMsg("");
     setError("");
+    setLoading(true);
 
     try {
       const res = await register(form);
       setMsg(res.message);
     } catch (err) {
       setError(err.response?.data?.message || "Error al registrarse.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -38,10 +42,10 @@ export default function RegisterPage() {
       {/* WRAPPER */}
       <div className="relative w-full max-w-md">
         {/* VOLVER AL HOME */}
-       <button
-  type="button"
-  onClick={() => navigate("/")}
-  className="
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="
     mt-4 mb-8
     md:absolute md:-top-20 md:left-0
 
@@ -52,10 +56,23 @@ export default function RegisterPage() {
     hover:bg-white/20 transition
     backdrop-blur-md
   "
->
-
+        >
           ← Volver al Home
         </button>
+
+        {loading && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-4">
+              {/* Spinner */}
+              <div className="w-12 h-12 rounded-full border-4 border-violet-500/30 border-t-violet-500 animate-spin" />
+
+              {/* Texto */}
+              <p className="text-sm text-violet-300 tracking-wide">
+                Creando cuenta…
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* CARD REGISTER */}
         <form
@@ -142,16 +159,18 @@ export default function RegisterPage() {
 
           <button
             type="submit"
-            className="
-              w-full py-3 rounded-xl
-              bg-gradient-to-r from-blue-600 to-violet-600
-              hover:from-blue-500 hover:to-violet-500
-              text-white font-semibold
-              transition-all
-              shadow-[0_0_25px_rgba(139,92,246,0.45)]
-            "
+            disabled={loading}
+            className={`
+    w-full py-3 rounded-xl
+    bg-gradient-to-r from-blue-600 to-violet-600
+    hover:from-blue-500 hover:to-violet-500
+    text-white font-semibold
+    transition-all
+    shadow-[0_0_25px_rgba(139,92,246,0.45)]
+    ${loading ? "opacity-60 cursor-not-allowed" : ""}
+  `}
           >
-            Registrarme
+            {loading ? "Procesando…" : "Registrarme"}
           </button>
 
           <p className="mt-4 text-sm text-center text-slate-300">

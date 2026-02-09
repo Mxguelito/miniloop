@@ -15,13 +15,19 @@ export function useConsorcios() {
   });
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [blockedMessage, setBlockedMessage] = useState(null);
 
   useEffect(() => {
     refresh();
   }, []);
 
-  function refresh() {
-    setList(getConsorcios());
+  async function refresh() {
+    try {
+      const data = await getConsorcios();
+      setList(data);
+    } catch (err) {
+      console.error("Error al cargar consorcios", err);
+    }
   }
 
   function openNew() {
@@ -45,20 +51,37 @@ export function useConsorcios() {
     setEditingId(null);
   }
 
-  function submit() {
-    if (editingId) {
-      updateConsorcio(editingId, form);
-    } else {
-      createConsorcio(form);
+  async function submit() {
+    try {
+      if (editingId) {
+        await updateConsorcio(editingId, form);
+      } else {
+        await createConsorcio(form);
+      }
+      await refresh();
+      closeForm();
+    } catch (err) {
+      console.error("Error al guardar consorcio", err);
     }
-    refresh();
-    closeForm();
   }
 
-  function remove(id) {
-    deleteConsorcio(id);
-    refresh();
+  async function remove(id) {
+  try {
+    await api.delete(`/consorcios/${id}`);
+    fetchConsorcios();
+  } catch (err) {
+    if (err.response?.status === 409) {
+      setBlockedMessage(
+        "Este consorcio no puede eliminarse porque tiene usuarios asignados. Quitá primero los usuarios o transferilos a otro consorcio."
+      );
+    } else {
+      setBlockedMessage(
+        "Ocurrió un error al intentar eliminar el consorcio."
+      );
+    }
   }
+}
+
 
   return {
     list,
@@ -71,5 +94,7 @@ export function useConsorcios() {
     closeForm,
     submit,
     remove,
+    blockedMessage,
+    setBlockedMessage,
   };
 }

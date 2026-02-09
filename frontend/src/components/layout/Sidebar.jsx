@@ -7,10 +7,18 @@ import UnidadIcon from "../icons/UnidadIcon";
 import Button from "../ui/Button";
 import KioscoIcon from "../icons/KioscoIcon";
 import { useLocation } from "react-router-dom";
+import { useSuscripcion } from "../../hooks/useSuscripcion";
+import { canUseFeature } from "../../utils/permissions";
 
 export default function Sidebar({ mobile = false, onNavigate }) {
+  const { data: suscripcion } = useSuscripcion();
+
   const { user, logout } = useAuth();
+
   const location = useLocation();
+
+  const canUse = (feature) =>
+    canUseFeature({ role: user?.role, suscripcion }, feature);
 
   // 👉 BASE DEL SIDEBAR (ACÁ VA EL BASECLASS)
   const baseClass =
@@ -39,7 +47,11 @@ export default function Sidebar({ mobile = false, onNavigate }) {
         </SidebarItem>
 
         {/* KIOSCO */}
-        <SidebarItem to="/kiosco" icon={<KioscoIcon />}>
+        <SidebarItem
+          to="/kiosco"
+          icon={<KioscoIcon />}
+          disabled={!canUse("KIOSCO")}
+        >
           Kiosco
         </SidebarItem>
 
@@ -86,12 +98,15 @@ export default function Sidebar({ mobile = false, onNavigate }) {
             <SidebarItem to="/propietario" icon={<HomeIcon />}>
               Inicio
             </SidebarItem>
+
             <SidebarItem
               to="/propietario/liquidaciones"
               icon={<LiquidacionIcon />}
+              disabled={!canUse("VIEW_INFO")}
             >
               Mis liquidaciones
             </SidebarItem>
+
             <SidebarItem to="/mi-unidad" icon={<UnidadIcon />}>
               Mi unidad
             </SidebarItem>
@@ -121,19 +136,35 @@ export default function Sidebar({ mobile = false, onNavigate }) {
 }
 
 // ITEM DEL SIDEBAR
-function SidebarItem({ to, icon, children }) {
+function SidebarItem({ to, icon, children, disabled = false }) {
   const location = useLocation();
   const isActive = location.pathname === to;
+
+  if (disabled) {
+    return (
+      <div
+        className="
+          flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium
+          text-slate-500 cursor-not-allowed opacity-60
+        "
+      >
+        <span className="w-6 flex justify-center">{icon}</span>
+        {children}
+        <span className="ml-auto text-xs opacity-70">Plan requerido</span>
+      </div>
+    );
+  }
+
   return (
     <Link
       to={to}
       className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium tracking-tight transition
-    ${
-      isActive
-        ? "bg-blue-500/15 text-blue-400 shadow-inner shadow-blue-500/20"
-        : "text-slate-300 hover:bg-white/10 hover:text-white"
-    }
-  `}
+        ${
+          isActive
+            ? "bg-blue-500/15 text-blue-400 shadow-inner shadow-blue-500/20"
+            : "text-slate-300 hover:bg-white/10 hover:text-white"
+        }
+      `}
     >
       <span className="w-6 flex justify-center">{icon}</span>
       {children}

@@ -13,7 +13,9 @@ import propietarioRoutes from "./routes/propietario.routes.js";
 import tesoreroRoutes from "./routes/tesorero.routes.js";
 import kioscoRoutes from "./routes/kiosco.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
-
+import suscripcionRoutes from "./routes/suscripcion.routes.js";
+import consorciosRoutes from "./routes/consorcios.routes.js";
+import planesRoutes from "./routes/planes.routes.js";
 
 
 const app = express();
@@ -63,6 +65,14 @@ app.use(morgan("dev"));
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use("/api/upload", uploadRoutes);
 
+
+// RUTAS DE SUSCRIPCIÓN
+app.use("/api/suscripcion", suscripcionRoutes);
+// RUTAS DE CONSORCIOS
+app.use("/api/consorcios", consorciosRoutes);
+
+// RUTAS DE PLANES
+app.use("/api/planes", planesRoutes);
 
 
 

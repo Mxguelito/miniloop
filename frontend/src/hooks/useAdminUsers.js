@@ -4,25 +4,59 @@ import axiosInstance from "../api/axiosInstance";
 export default function useAdminUsers() {
   const [users, setUsers] = useState([]);
 
-  // Cargar usuarios
+  // =========================
+  // CARGAR USUARIOS
+  // =========================
   async function loadUsers() {
     const res = await axiosInstance.get("/auth/users");
     setUsers(res.data);
   }
 
-  // Aprobar
-  async function aprobar(id) {
-    await axiosInstance.patch(`/admin/usuarios/${id}/approve`);
+  // =========================
+  // APROBAR CON CONSORCIO (NUEVO)
+  // =========================
+  async function aprobarConConsorcio(data) {
+    /*
+      data puede ser:
+
+      {
+        userId: number,
+        consorcioId: number
+      }
+
+      o
+
+      {
+        userId: number,
+        nuevoConsorcio: {
+          nombre: string
+        }
+      }
+    */
+
+    const { userId, consorcioId, nuevoConsorcio } = data;
+
+    await axiosInstance.patch(
+      `/admin/usuarios/${userId}/approve`,
+      consorcioId
+        ? { consorcioId }
+        : { nuevoConsorcio }
+    );
+
     loadUsers();
   }
 
-  // Rechazar
+  // =========================
+  // RECHAZAR
+  // =========================
   async function rechazar(id) {
     await axiosInstance.patch(`/admin/usuarios/${id}/reject`);
     loadUsers();
   }
 
-  // Eliminar (pending / rejected)
+  // =========================
+  // ELIMINAR
+  // =========================
   async function eliminar(id) {
     const ok = confirm("¿Seguro que querés eliminar este usuario?");
     if (!ok) return;
@@ -31,36 +65,43 @@ export default function useAdminUsers() {
     loadUsers();
   }
 
-  // Editar usuario activo (nombre / email)
-async function editarUsuario(id, data) {
-  await axiosInstance.patch(`/admin/usuarios/${id}`, data);
-  loadUsers();
-}
-async function desactivar(id) {
-  try {
-    await axiosInstance.patch(`/admin/usuarios/${id}/deactivate`);
-
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.id === id ? { ...u, estado: "inactive" } : u
-      )
-    );
-  } catch (err) {
-    alert(
-      err.response?.data?.message || "Error al desactivar usuario"
-    );
+  // =========================
+  // EDITAR USUARIO ACTIVO
+  // =========================
+  async function editarUsuario(id, data) {
+    await axiosInstance.patch(`/admin/usuarios/${id}`, data);
+    loadUsers();
   }
-}
 
+  // =========================
+  // DESACTIVAR
+  // =========================
+  async function desactivar(id) {
+    try {
+      await axiosInstance.patch(`/admin/usuarios/${id}/deactivate`);
 
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === id ? { ...u, estado: "inactive" } : u
+        )
+      );
+    } catch (err) {
+      alert(
+        err.response?.data?.message || "Error al desactivar usuario"
+      );
+    }
+  }
 
+  // =========================
+  // INIT
+  // =========================
   useEffect(() => {
     loadUsers();
   }, []);
 
   return {
     users,
-    aprobar,
+    aprobarConConsorcio, // 👈 NUEVO
     rechazar,
     eliminar,
     editarUsuario,

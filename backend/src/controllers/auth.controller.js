@@ -12,9 +12,10 @@ function generarToken(user) {
       id: user.id,
       role: user.role,
       email: user.email,
+      consorcio_id: user.consorcio_id, // 👈 ESTA LÍNEA ES LA CLAVE
     },
-    process.env.JWT_SECRET, // ✅ SIEMPRE DESDE ENV
-    { expiresIn: "7d" }
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" },
   );
 }
 
@@ -27,14 +28,12 @@ export async function register(req, res) {
   try {
     // Roles permitidos
     const rolesPermitidos = ["PROPIETARIO", "INQUILINO", "TESORERO"];
-    const roleFinal = rolesPermitidos.includes(role)
-      ? role
-      : "PROPIETARIO";
+    const roleFinal = rolesPermitidos.includes(role) ? role : "PROPIETARIO";
 
     // Verificar email existente
     const exists = await pool.query(
       "SELECT id FROM usuarios WHERE email = $1",
-      [email]
+      [email],
     );
 
     if (exists.rowCount > 0) {
@@ -54,7 +53,7 @@ export async function register(req, res) {
       VALUES ($1, $2, $3, $4, 'pending')
       RETURNING id, nombre, email, role, estado
       `,
-      [nombre, email, hashedPassword, roleFinal]
+      [nombre, email, hashedPassword, roleFinal],
     );
 
     res.json({
@@ -72,12 +71,27 @@ export async function register(req, res) {
 // ========================
 // LOGIN
 // ========================
+// ========================
+// LOGIN (FIX DEFINITIVO)
+// ========================
 export async function login(req, res) {
   const { email, password } = req.body;
 
   try {
     const result = await pool.query(
-      "SELECT * FROM usuarios WHERE email = $1",
+      `
+      SELECT 
+        u.id,
+        u.nombre,
+        u.email,
+        u.password,
+        u.role,
+        u.estado,
+        p.consorcio_id
+      FROM usuarios u
+      LEFT JOIN propietarios p ON p.usuario_id = u.id
+      WHERE u.email = $1
+      `,
       [email]
     );
 
@@ -89,7 +103,7 @@ export async function login(req, res) {
 
     const user = result.rows[0];
 
-    // Validar password
+    // 🔐 Validar password
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res.status(400).json({
@@ -97,16 +111,29 @@ export async function login(req, res) {
       });
     }
 
-    // Si NO es admin → debe estar activo
+    // 🚫 Usuario no admin debe estar activo
     if (user.role !== "ADMIN" && user.estado !== "active") {
       return res.status(403).json({
         message: "Tu cuenta está pendiente de aprobación",
       });
     }
 
-    // Generar token
-    const token = generarToken(user);
+    // 🏢 Validación fuerte de consorcio
+    if (user.role === "PROPIETARIO" && !user.consorcio_id) {
+      return res.status(400).json({
+        message: "El propietario no tiene consorcio asignado",
+      });
+    }
 
+    // 🔑 Generar token con consorcio_id
+    const token = generarToken({
+      id: user.id,
+      role: user.role,
+      email: user.email,
+      consorcio_id: user.consorcio_id ?? null,
+    });
+
+    // ✅ RESPUESTA LIMPIA Y COMPLETA
     res.json({
       token,
       user: {
@@ -114,6 +141,7 @@ export async function login(req, res) {
         nombre: user.nombre,
         email: user.email,
         role: user.role,
+        consorcio_id: user.consorcio_id ?? null,
       },
     });
   } catch (err) {
@@ -124,13 +152,14 @@ export async function login(req, res) {
   }
 }
 
+
 // ========================
 // LISTAR USUARIOS (ADMIN)
 // ========================
 export async function getAllUsers(req, res) {
   try {
     const q = await pool.query(
-      "SELECT id, nombre, email, role, estado FROM usuarios ORDER BY id DESC"
+      "SELECT id, nombre, email, role, estado FROM usuarios ORDER BY id DESC",
     );
     res.json(q.rows);
   } catch (err) {
