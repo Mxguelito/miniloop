@@ -9,8 +9,8 @@ BEGIN;
 -- -------------------------------
 CREATE TABLE IF NOT EXISTS planes (
   id SERIAL PRIMARY KEY,
-  nombre VARCHAR(50) NOT NULL UNIQUE,      -- BASIC, PRO, PREMIUM
-  precio INTEGER NOT NULL,                  -- precio mensual
+  nombre VARCHAR(50) NOT NULL UNIQUE,
+  precio INTEGER NOT NULL,
   descripcion TEXT,
   activo BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT NOW()
@@ -28,18 +28,28 @@ CREATE TABLE IF NOT EXISTS suscripciones (
   fecha_fin DATE NOT NULL,
 
   estado VARCHAR(20) NOT NULL CHECK (
-    estado IN ('ACTIVA', 'EN_GRACIA', 'SUSPENDIDA')
+    estado IN ('ACTIVO', 'EN_GRACIA', 'SUSPENDIDO')
   ),
 
-  created_at TIMESTAMP DEFAULT NOW(),
-
-  CONSTRAINT fk_suscripcion_plan
-    FOREIGN KEY (plan_id)
-    REFERENCES planes(id),
-
-  CONSTRAINT fk_suscripcion_consorcio
-    FOREIGN KEY (consorcio_id)
-    REFERENCES consorcios(id)
+  created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- 🔒 Blindaje FK
+
+ALTER TABLE IF EXISTS suscripciones
+DROP CONSTRAINT IF EXISTS fk_suscripcion_plan;
+
+ALTER TABLE suscripciones
+ADD CONSTRAINT fk_suscripcion_plan
+FOREIGN KEY (plan_id)
+REFERENCES planes(id);
+
+ALTER TABLE IF EXISTS suscripciones
+DROP CONSTRAINT IF EXISTS fk_suscripcion_consorcio;
+
+ALTER TABLE suscripciones
+ADD CONSTRAINT fk_suscripcion_consorcio
+FOREIGN KEY (consorcio_id)
+REFERENCES consorcios(id);
 
 COMMIT;

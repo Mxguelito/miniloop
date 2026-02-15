@@ -38,7 +38,6 @@ const PLANES = [
   },
 ];
 
-
 /* ======================================================
    PAGE
 ====================================================== */
@@ -46,22 +45,22 @@ const PLANES = [
 export default function PlanesPage() {
   const { user } = useAuth();
   const [activandoPlan, setActivandoPlan] = useState(null);
-const navigate = useNavigate();
-const { data: suscripcion } = useSuscripcion();
-const planActual = suscripcion?.plan; // "BASIC" | "PRO" | "PREMIUM"
+  const navigate = useNavigate();
+  const { suscripcion, refresh } = useSuscripcion();
+
+  const planActual = suscripcion?.plan; // "BASIC" | "PRO" | "PREMIUM"
 
   async function elegirPlan(planNombre) {
     try {
       setActivandoPlan(planNombre);
 
-      await api.post("/suscripciones", {
+      await api.post("/suscripcion/activar", {
         plan: planNombre,
       });
 
-      setTimeout(() => {
-        navigate("/");
-        window.location.reload();
-      }, 1200);
+      await refresh(); // refresca la suscripción real
+
+      navigate("/dashboard"); // mejor que "/"
     } catch (error) {
       console.error(error);
       setActivandoPlan(null);
@@ -156,14 +155,15 @@ function PlanCard({ plan, onChoose, isAdmin, planActual }) {
         ${stylesByPlan[plan.nombre]}`}
     >
       {esPlanActual && (
-  <div className="absolute top-4 right-4">
-    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium 
-      bg-green-500/20 text-green-300 border border-green-500/30">
-      Plan actual
-    </span>
-  </div>
-)}
-
+        <div className="absolute top-4 right-4">
+          <span
+            className="px-2 py-0.5 rounded-full text-[10px] font-medium 
+      bg-green-500/20 text-green-300 border border-green-500/30"
+          >
+            Plan actual
+          </span>
+        </div>
+      )}
 
       {/* BADGE */}
       {plan.recomendado && (
@@ -180,31 +180,30 @@ function PlanCard({ plan, onChoose, isAdmin, planActual }) {
 
       <p className="text-gray-400 mt-3">{plan.descripcion}</p>
       <ul className="mt-4 space-y-2 text-sm text-gray-300">
-  {plan.nombre === "BASIC" && (
-    <>
-      <li>✔ Gestión esencial del consorcio</li>
-      <li>✔ Control de expensas y usuarios</li>
-      <li>✔ Información clara y centralizada</li>
-    </>
-  )}
+        {plan.nombre === "BASIC" && (
+          <>
+            <li>✔ Gestión esencial del consorcio</li>
+            <li>✔ Control de expensas y usuarios</li>
+            <li>✔ Información clara y centralizada</li>
+          </>
+        )}
 
-  {plan.nombre === "PRO" && (
-    <>
-      <li>✔ Todas las funciones activas</li>
-      <li>✔ Liquidaciones completas y reportes</li>
-      <li>✔ Automatización del día a día</li>
-    </>
-  )}
+        {plan.nombre === "PRO" && (
+          <>
+            <li>✔ Todas las funciones activas</li>
+            <li>✔ Liquidaciones completas y reportes</li>
+            <li>✔ Automatización del día a día</li>
+          </>
+        )}
 
-  {plan.nombre === "PREMIUM" && (
-    <>
-      <li>✔ Automatización avanzada</li>
-      <li>✔ Reportes premium</li>
-      <li>✔ Soporte prioritario</li>
-    </>
-  )}
-</ul>
-
+        {plan.nombre === "PREMIUM" && (
+          <>
+            <li>✔ Automatización avanzada</li>
+            <li>✔ Reportes premium</li>
+            <li>✔ Soporte prioritario</li>
+          </>
+        )}
+      </ul>
 
       {/* PRICE */}
       <div className="mt-8 text-4xl font-bold">

@@ -25,9 +25,24 @@ export default function UpgradeModal({ open, onClose, feature }) {
         "Servicios externos integrados",
       ],
     },
+      MIS_LIQUIDACIONES: {
+    title: "Historial de liquidaciones",
+    desc: "Accedé al detalle completo de tus liquidaciones mensuales.",
+    benefits: [
+      "Resumen por período",
+      "Detalle de expensas",
+      "Historial completo",
+    ],
+  },
   };
 
-  const data = featuresCopy[feature];
+ const data =
+  featuresCopy[feature] || {
+    title: "Función premium",
+    desc: "Esta función requiere un plan superior.",
+    benefits: [],
+  };
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">

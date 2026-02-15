@@ -1,102 +1,121 @@
 import { useSuscripcion } from "../../hooks/useSuscripcion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { canUseFeature } from "../../utils/permissions";
 
 export default function SuscripcionBanner() {
-  const { data, loading } = useSuscripcion();
+  const { suscripcion, loading } = useSuscripcion();
   const { user } = useAuth();
-
   const navigate = useNavigate();
 
-  if (loading || !data) return null;
-  // 👑 ADMIN nunca ve banner de plan
+  if (loading || !suscripcion) return null;
   if (user?.role === "ADMIN") return null;
 
-  const estado = data?.estado ?? "SIN_SUSCRIPCION";
-  const diasRestantes = data?.diasRestantes ?? null;
-  const plan = data?.plan ?? "BASIC";
+  const estado = suscripcion?.estado ?? "SIN_SUSCRIPCION";
+  const diasRestantes = suscripcion?.diasRestantes ?? null;
+  const plan = suscripcion?.plan ?? "BASIC";
 
-  // 🎨 Colores base por estado
-  const colors = {
-    ACTIVO: "border-green-500/40 bg-green-500/10 text-green-300",
-    EN_GRACIA: "border-yellow-500/40 bg-yellow-500/10 text-yellow-300",
-    SUSPENDIDO: "border-red-500/40 bg-red-500/10 text-red-300",
-    SIN_SUSCRIPCION: "border-red-500/40 bg-red-500/10 text-red-300",
-  };
-
-  // 🟢 Dot visual
-  const dot = {
-    ACTIVO: "bg-green-400",
-    EN_GRACIA: "bg-yellow-400",
-    SUSPENDIDO: "bg-red-400",
-    SIN_SUSCRIPCION: "bg-red-400",
-  };
-
-  // 🧠 Copy comercial (no técnico)
-  const copy = {
+  // 🎨 estilos dinámicos
+  const variants = {
     ACTIVO: {
-      title: "Plan activo",
-      subtitle: "MiniLoop está funcionando con todas las funciones habilitadas",
+      bg: "from-emerald-500/20 via-emerald-400/10 to-transparent",
+      border: "border-emerald-400/40",
+      glow: "shadow-[0_0_50px_rgba(16,185,129,0.35)]",
+      dot: "bg-emerald-400",
     },
     EN_GRACIA: {
-      title: "Plan por vencer",
-      subtitle: "Renová para evitar la suspensión de funciones",
+      bg: "from-yellow-500/20 via-yellow-400/10 to-transparent",
+      border: "border-yellow-400/40",
+      glow: "shadow-[0_0_50px_rgba(234,179,8,0.35)]",
+      dot: "bg-yellow-400",
     },
     SUSPENDIDO: {
-      title: "Plan suspendido",
-      subtitle: "Algunas acciones están deshabilitadas",
+      bg: "from-red-500/20 via-red-400/10 to-transparent",
+      border: "border-red-400/40",
+      glow: "shadow-[0_0_50px_rgba(239,68,68,0.35)]",
+      dot: "bg-red-400",
     },
     SIN_SUSCRIPCION: {
-      title: "Plan inactivo",
-      subtitle: "Activá MiniLoop para habilitar funciones avanzadas",
+      bg: "from-red-500/20 via-red-400/10 to-transparent",
+      border: "border-red-400/40",
+      glow: "shadow-[0_0_50px_rgba(239,68,68,0.35)]",
+      dot: "bg-red-400",
     },
   };
 
-  // 🟡 Tesorero sin plan activo → aviso suave (no rojo)
-  const isTesorero = user?.role === "TESORERO";
-
-  let estadoVisual = estado;
-
-  if (isTesorero && estado !== "ACTIVO" && estado !== "EN_GRACIA") {
-    estadoVisual = "EN_GRACIA";
-  }
+  const v = variants[estado] || variants.SIN_SUSCRIPCION;
 
   return (
     <div
-      className={`w-full border rounded-xl p-4 mb-6 backdrop-blur-md ${colors[estadoVisual]}`}
+      className={`
+        relative overflow-hidden
+        w-full rounded-2xl border ${v.border}
+        bg-gradient-to-r ${v.bg}
+        backdrop-blur-xl
+        p-5 md:p-6
+        ${v.glow}
+        transition-all duration-300
+      `}
     >
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        {/* INFO PRINCIPAL */}
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className={`w-2 h-2 rounded-full ${dot[estadoVisual]}`} />
-            <h3 className="text-lg font-semibold">{copy[estadoVisual].title}</h3>
+      {/* GRID */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+
+        {/* INFO IZQUIERDA */}
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-2">
+            <span className={`w-3 h-3 rounded-full ${v.dot}`} />
+            <h3 className="text-lg md:text-xl font-semibold text-white">
+              {estado === "ACTIVO" && "Plan activo"}
+              {estado === "EN_GRACIA" && "Plan por vencer"}
+              {estado === "SUSPENDIDO" && "Plan suspendido"}
+              {estado === "SIN_SUSCRIPCION" && "Plan inactivo"}
+            </h3>
           </div>
 
-          <p className="text-sm opacity-80">{copy[estadoVisual].subtitle}</p>
-          {plan && (
-            <p className="text-xs opacity-70 mt-1">
-              Plan actual: <strong>{plan}</strong>
+          <p className="text-white/80 text-sm md:text-base">
+            MiniLoop está funcionando bajo el plan{" "}
+            <span className="font-bold text-white">{plan}</span>.
+          </p>
+
+          {estado === "EN_GRACIA" && (
+            <p className="text-yellow-300 text-sm mt-1">
+              Renovalo para evitar interrupciones.
             </p>
           )}
 
-          {/* CTA SUAVE */}
-          <button
-            onClick={() => navigate("/planes")}
-            className="mt-2 text-sm underline opacity-80 hover:opacity-100 transition"
-          >
-            Ver planes
-          </button>
+          {estado === "SUSPENDIDO" && (
+            <p className="text-red-300 text-sm mt-1">
+              Algunas funciones están limitadas.
+            </p>
+          )}
         </div>
 
-        {/* FECHA / RESTANTE */}
-        {diasRestantes !== null && (
-          <div className="text-right">
-            <p className="text-xs opacity-70">Vencimiento</p>
-            <p className="text-lg font-bold">{diasRestantes} días</p>
-          </div>
-        )}
+        {/* INFO DERECHA */}
+        <div className="flex items-center justify-between md:justify-end gap-6">
+
+          {diasRestantes !== null && (
+            <div className="text-left md:text-right">
+              <p className="text-xs text-white/60 uppercase tracking-wider">
+                Vencimiento
+              </p>
+              <p className="text-2xl font-bold text-white">
+                {diasRestantes} días
+              </p>
+            </div>
+          )}
+
+          <button
+            onClick={() => navigate("/planes")}
+            className="
+              px-5 py-2 rounded-xl
+              bg-white/10 hover:bg-white/20
+              border border-white/20
+              text-sm font-medium text-white
+              transition
+            "
+          >
+            Gestionar plan
+          </button>
+        </div>
       </div>
     </div>
   );

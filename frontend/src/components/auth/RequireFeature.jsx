@@ -5,7 +5,8 @@ import { canUseFeature } from "../../utils/permissions";
 
 export default function RequireFeature({ feature, children }) {
   const { user } = useAuth();
-  const { data: suscripcion, loading } = useSuscripcion();
+ const { suscripcion, loading } = useSuscripcion();
+
 
   if (loading) {
     return null; // después le metemos loader lindo

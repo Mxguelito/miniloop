@@ -6,8 +6,13 @@ import {
   deleteConsorcio,
   getUsuariosConsorcio,
   quitarUsuarioConsorcio,
+  getSuscripcionConsorcioAdmin,
   
 } from "../controllers/consorcios.controller.js";
+import { authRequired } from "../middleware/auth.js";
+
+
+
 
 const router = Router();
 
@@ -17,6 +22,14 @@ router.put("/:id", updateConsorcio);
 router.delete("/:id", deleteConsorcio);
 router.get("/:id/usuarios", getUsuariosConsorcio);
 router.delete("/:id/usuarios/:usuarioId", quitarUsuarioConsorcio);
+router.get(
+  "/:id/suscripcion",
+  authRequired,
+  getSuscripcionConsorcioAdmin
+);
+
+
+
 
 
 export default router;

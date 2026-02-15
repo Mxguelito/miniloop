@@ -203,5 +203,67 @@ export async function quitarUsuarioConsorcio(req, res) {
   }
 }
 // ===============================
-// GET /api/consorcios/:id/usuarios
-// ===============================
+const DIAS_GRACIA = 7;
+
+export async function getSuscripcionConsorcioAdmin(req, res) {
+  try {
+    const { id: consorcioId } = req.params;
+
+    const result = await pool.query(
+      `
+      SELECT s.*, p.nombre AS plan_nombre
+      FROM suscripciones s
+      JOIN planes p ON p.id = s.plan_id
+      WHERE s.consorcio_id = $1
+      ORDER BY s.fecha_fin DESC
+      LIMIT 1
+      `,
+      [consorcioId]
+    );
+
+    // 🔹 SIN SUSCRIPCIÓN
+    if (result.rows.length === 0) {
+      return res.json({
+        estado: "SIN_SUSCRIPCION",
+        plan: "BASIC",
+        dias_restantes: null,
+        fecha_fin: null,
+      });
+    }
+
+    const suscripcion = result.rows[0];
+
+    const hoy = new Date();
+    const fechaFin = new Date(suscripcion.fecha_fin);
+
+    let estadoReal = suscripcion.estado;
+    let diasRestantes = Math.ceil(
+      (fechaFin - hoy) / (1000 * 60 * 60 * 24)
+    );
+
+    if (diasRestantes < 0) {
+      const fechaGracia = new Date(fechaFin);
+      fechaGracia.setDate(fechaGracia.getDate() + DIAS_GRACIA);
+
+      if (hoy <= fechaGracia) {
+        estadoReal = "EN_GRACIA";
+      } else {
+        estadoReal = "SUSPENDIDO";
+      }
+
+      diasRestantes = 0;
+    }
+
+    return res.json({
+      plan: suscripcion.plan_nombre,
+      estado: estadoReal,
+      fecha_fin: suscripcion.fecha_fin,
+      dias_restantes: diasRestantes,
+    });
+  } catch (error) {
+    console.error("Error getSuscripcionConsorcioAdmin:", error);
+    res.status(500).json({
+      message: "Error obteniendo suscripción del consorcio",
+    });
+  }
+}

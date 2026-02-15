@@ -3,6 +3,7 @@ import { useConsorcios } from "../hooks/useConsorcios";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import BlockActionModal from "../components/ui/BlockActionModal";
+import ConsorcioCard from "../components/consorcios/ConsorcioCard";
 
 export default function ConsorciosPage() {
   const navigate = useNavigate();
@@ -26,11 +27,9 @@ export default function ConsorciosPage() {
   return (
     <AppLayout>
       <div className="p-4 sm:p-6 text-white">
-        {/* CONTENEDOR CENTRAL */}
         <div className="max-w-7xl mx-auto space-y-6">
-          {/* ===============================
-              HEADER
-          =============================== */}
+
+          {/* ================= HEADER ================= */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold">Consorcios</h1>
@@ -41,22 +40,13 @@ export default function ConsorciosPage() {
 
             <button
               onClick={openNew}
-              className="
-                px-5 py-2.5
-                rounded-xl
-                bg-blue-600
-                hover:bg-blue-500
-                transition
-                font-semibold
-              "
+              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 transition font-semibold"
             >
               + Nuevo consorcio
             </button>
           </div>
 
-          {/* ===============================
-              LISTADO
-          =============================== */}
+          {/* ================= LISTADO ================= */}
           {list.length === 0 ? (
             <div className="text-center py-20 text-gray-400">
               <div className="text-5xl mb-4">🏢</div>
@@ -66,143 +56,31 @@ export default function ConsorciosPage() {
               </p>
             </div>
           ) : (
-            <div
-              className="
-                grid
-                grid-cols-1
-                md:grid-cols-2
-                xl:grid-cols-3
-                gap-4
-              "
-            >
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {list.map((c) => (
-                <div
+                <ConsorcioCard
                   key={c.id}
-                  className="
-                    bg-[#0f1e29]
-                    rounded-2xl
-                    p-4
-                    border border-white/10
-                    shadow-md
-                    hover:border-white/20
-                    transition
-                  "
-                >
-                  {/* HEADER CARD */}
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h3 className="text-base font-semibold truncate">
-                        {c.nombre}
-                      </h3>
-
-                      {c.direccion && (
-                        <p className="text-xs text-gray-400 truncate mt-0.5">
-                          {c.direccion}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* BADGE USUARIOS */}
-                    <span
-                      className="
-    flex items-center gap-1
-    px-2.5 py-0.5
-    rounded-full
-    bg-emerald-500/15
-    text-emerald-300
-    text-xs
-    font-semibold
-    border border-emerald-400/20
-    shadow-[0_0_10px_rgba(52,211,153,0.25)]
-    whitespace-nowrap
-  "
-                    >
-                      👤 {c.usuarios_count ?? 0}
-                    </span>
-                  </div>
-
-                  {/* PLAN */}
-                  <div className="mt-3 rounded-xl bg-black/30 p-3 border border-white/10">
-                    <p className="text-xs text-white/60">Plan</p>
-                    <p className="text-sm font-medium mt-0.5">
-                      Gestión de suscripción
-                    </p>
-                  </div>
-
-                  {/* ACCIONES */}
-                  <div className="grid grid-cols-3 gap-2 mt-4 text-sm">
-                    {/* EDITAR */}
-                    <button
-                      onClick={() => openEdit(c)}
-                      className="
-    flex items-center justify-center
-    py-2
-    rounded-lg
-    bg-blue-500/10
-    text-blue-300
-    hover:bg-blue-500/20
-    transition
-  "
-                    >
-                      Editar
-                    </button>
-
-                    {/* VER USUARIOS */}
-                    <button
-                      onClick={() => navigate(`/consorcios/${c.id}/usuarios`)}
-                      className="
-    flex
-    items-center
-    justify-center
-    gap-1
-    py-2
-    rounded-lg
-    bg-indigo-500/15
-    text-indigo-300
-    hover:bg-indigo-500/30
-    hover:text-indigo-200
-    transition
-    shadow-inner
-  "
-                      title="Ver usuarios"
-                    >
-                      👁
-                    </button>
-
-                    {/* ELIMINAR */}
-                    <button
-                      onClick={() => {
-                        if ((c.usuarios_count ?? 0) > 0) {
-                          setBlockedMessage(
-                            `Este consorcio tiene ${c.usuarios_count} usuarios asignados.`,
-                          );
-                          return;
-                        }
-                        setConsorcioAEliminar(c);
-                      }}
-                      className="
-    flex items-center justify-center
-    py-2
-    rounded-lg
-    bg-red-500/10
-    text-red-400
-    hover:bg-red-500/25
-    transition
-    font-semibold
-  "
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </div>
+                  consorcio={c}
+                  onEdit={openEdit}
+                  onViewUsers={() =>
+                    navigate(`/consorcios/${c.id}/usuarios`)
+                  }
+                  onDelete={(consorcio) => {
+                    if ((consorcio.usuarios_count ?? 0) > 0) {
+                      setBlockedMessage(
+                        `Este consorcio tiene ${consorcio.usuarios_count} usuarios asignados.`
+                      );
+                      return;
+                    }
+                    setConsorcioAEliminar(consorcio);
+                  }}
+                />
               ))}
             </div>
           )}
         </div>
 
-        {/* ===============================
-            MODAL FORM
-        =============================== */}
+        {/* ================= MODAL FORM ================= */}
         {showForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
             <div className="bg-[#0f1e29] rounded-2xl p-6 w-full max-w-md border border-white/10">
@@ -221,15 +99,10 @@ export default function ConsorciosPage() {
                   type="text"
                   placeholder="Nombre del consorcio"
                   value={form.nombre || ""}
-                  onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                  className="
-                    w-full
-                    px-4 py-2
-                    rounded-lg
-                    bg-black/40
-                    border border-white/10
-                    focus:outline-none
-                  "
+                  onChange={(e) =>
+                    setForm({ ...form, nombre: e.target.value })
+                  }
+                  className="w-full px-4 py-2 rounded-lg bg-black/40 border border-white/10"
                 />
 
                 <input
@@ -239,14 +112,7 @@ export default function ConsorciosPage() {
                   onChange={(e) =>
                     setForm({ ...form, direccion: e.target.value })
                   }
-                  className="
-                    w-full
-                    px-4 py-2
-                    rounded-lg
-                    bg-black/40
-                    border border-white/10
-                    focus:outline-none
-                  "
+                  className="w-full px-4 py-2 rounded-lg bg-black/40 border border-white/10"
                 />
 
                 <div className="flex gap-3 pt-2">
@@ -270,12 +136,10 @@ export default function ConsorciosPage() {
           </div>
         )}
 
-        {/* ===============================
-            MODAL ELIMINAR
-        =============================== */}
+        {/* ================= MODAL ELIMINAR ================= */}
         {consorcioAEliminar && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-            <div className="w-full max-w-md rounded-2xl bg-[#0f1e29] border border-white/10 shadow-2xl p-6">
+            <div className="w-full max-w-md rounded-2xl bg-[#0f1e29] border border-white/10 p-6">
               <h2 className="text-xl font-bold text-red-400 mb-2">
                 Eliminar consorcio
               </h2>
@@ -284,7 +148,9 @@ export default function ConsorciosPage() {
                 Esta acción no se puede deshacer
               </p>
 
-              <p className="font-semibold">{consorcioAEliminar.nombre}</p>
+              <p className="font-semibold">
+                {consorcioAEliminar.nombre}
+              </p>
 
               <div className="flex gap-3 mt-6">
                 <button
@@ -308,9 +174,7 @@ export default function ConsorciosPage() {
           </div>
         )}
 
-        {/* ===============================
-            MODAL BLOQUEADO
-        =============================== */}
+        {/* ================= MODAL BLOQUEADO ================= */}
         {blockedMessage && (
           <BlockActionModal
             title="Acción bloqueada"

@@ -2,6 +2,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 
+import { runMigrations } from "./config/migrate.js";
 
 import express from "express";
 import cors from "cors";
@@ -91,5 +92,8 @@ app.use("/api/kiosco", kioscoRoutes);
 app.get("/", (req, res) => {
   res.json({ message: "Backend Miniloop funcionando ✅" });
 });
+
+// Ejecutar migraciones al iniciar
+await runMigrations();
 
 export default app;

@@ -8,7 +8,8 @@ import {
   getSolicitudesUnidadPendientes,
   aprobarSolicitudUnidad,
   rechazarSolicitudUnidad,
-  deactivateUser, 
+  deactivateUser,
+   
 } from "../controllers/admin.controller.js";
 import { authRequired } from "../middleware/auth.js";
 

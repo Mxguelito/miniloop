@@ -1,32 +1,44 @@
+const PLAN_PERMISSIONS = {
+  BASIC: [
+    "VIEW_INFO",
+  ],
+
+  PRO: [
+    "VIEW_INFO",
+    "KIOSCO",
+    "MI_UNIDAD",
+    "MIS_LIQUIDACIONES",
+    "TESORERO_PANEL",
+    "LIQUIDACIONES",
+    "SOCIAL_HOME",
+  ],
+
+  PREMIUM: [
+    "VIEW_INFO",
+    "KIOSCO",
+    "MI_UNIDAD",
+    "MIS_LIQUIDACIONES",
+    "TESORERO_PANEL",
+    "LIQUIDACIONES",
+    "EXPORTAR_PDF",
+    "SOCIAL_HOME",
+  ],
+};
+
 export function canUseFeature({ role, suscripcion }, feature) {
-  // 👑 ADMIN: nunca se bloquea
   if (role === "ADMIN") return true;
 
-  // 🧾 Datos mínimos
   const estado = suscripcion?.estado;
   const plan = suscripcion?.plan;
 
-  // 🔍 VER INFO siempre permitido
-  if (feature === "VIEW_INFO") return true;
+  if (!plan) return false;
 
-  // 🚫 Sin suscripción activa
+  // Si no está activa la suscripción → todo bloqueado
   if (estado !== "ACTIVO" && estado !== "EN_GRACIA") {
-    // Tesorero puede ver info, nada más
     return false;
   }
 
-  // 🔓 Con suscripción activa
-  switch (feature) {
-    case "KIOSCO":
-      return role === "PROPIETARIO" && plan !== "BASIC";
+  const allowedFeatures = PLAN_PERMISSIONS[plan] || [];
 
-    case "PAGOS":
-      return role === "PROPIETARIO";
-
-    case "EXPORTAR_PDF":
-      return role === "TESORERO" && plan !== "BASIC";
-
-    default:
-      return false;
-  }
+  return allowedFeatures.includes(feature);
 }

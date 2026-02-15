@@ -6,6 +6,9 @@ import {
   deleteLiquidacion,
 } from "../services/liquidacionesService";
 
+import { useAuth } from "../context/AuthContext";
+import { useSuscripcion } from "../hooks/useSuscripcion";
+
 import LiquidacionesHeader from "../components/tesoreria/LiquidacionesHeader";
 import ResumenFinanciero from "../components/tesoreria/ResumenFinanciero";
 import LiquidacionesCards from "../components/tesoreria/LiquidacionesCards";
@@ -15,9 +18,17 @@ import { exportLiquidacionPDF } from "../utils/exportLiquidacionPDF";
 
 export default function LiquidacionesPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { suscripcion } = useSuscripcion();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [yearFilter, setYearFilter] = useState("todos");
+
+  const liquidacionesBloqueadas =
+    user?.role === "TESORERO" &&
+    (suscripcion?.plan === "BASIC" ||
+      (suscripcion?.estado !== "ACTIVO" &&
+        suscripcion?.estado !== "EN_GRACIA"));
 
   // ===== CARGA =====
   useEffect(() => {
@@ -43,12 +54,12 @@ export default function LiquidacionesPage() {
   // ===== TOTALES =====
   const saldoTotal = filteredItems.reduce(
     (acc, l) => acc + Number(l.saldo_mes || 0),
-    0
+    0,
   );
 
   const deudaTotal = filteredItems.reduce(
     (acc, l) => acc + Number(l.deuda_total || 0),
-    0
+    0,
   );
 
   // ===== ACCIONES =====
@@ -71,44 +82,69 @@ export default function LiquidacionesPage() {
     }
   }
 
- return (
-  <AppLayout>
-    <div className="max-w-2xl mx-auto px-4 pb-24 space-y-6">
-      {/* HEADER */}
-      <LiquidacionesHeader
-        yearFilter={yearFilter}
-        onYearChange={setYearFilter}
-        onNueva={handleNueva}
-      />
+  return (
+    <AppLayout>
+      <div className="max-w-2xl mx-auto px-4 pb-24 space-y-6">
+        {/* HEADER */}
+        <LiquidacionesHeader
+          yearFilter={yearFilter}
+          onYearChange={setYearFilter}
+          onNueva={handleNueva}
+        />
 
-      {/* RESUMEN */}
-      <ResumenFinanciero
-        saldoTotal={saldoTotal}
-        deudaTotal={deudaTotal}
-      />
+        {/* RESUMEN */}
+        <ResumenFinanciero saldoTotal={saldoTotal} deudaTotal={deudaTotal} />
 
-      {/* ESTADO */}
-      {loading && (
-        <div className="text-gray-300">Cargando liquidaciones...</div>
-      )}
+        {/* ESTADO */}
+        {loading && (
+          <div className="text-gray-300">Cargando liquidaciones...</div>
+        )}
 
-      {!loading && filteredItems.length === 0 && (
-        <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4 text-gray-300">
-          No hay liquidaciones creadas aún.
+        {!loading && filteredItems.length === 0 && (
+          <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4 text-gray-300">
+            No hay liquidaciones creadas aún.
+          </div>
+        )}
+
+        {/* LISTADO MOBILE / GENERAL */}
+        {!loading && filteredItems.length > 0 && (
+          <LiquidacionesCards
+            items={filteredItems}
+            onVer={(id) => navigate(`/liquidaciones/${id}`)}
+            onExport={handleExport}
+            onDelete={handleDelete}
+          />
+        )}
+      </div>
+      {liquidacionesBloqueadas && (
+        <div
+          className="
+      fixed inset-0 z-[9999]
+      bg-black/70 backdrop-blur-sm
+      flex flex-col items-center justify-center
+      text-center px-6
+    "
+        >
+          <h2 className="text-2xl font-bold text-white mb-2">
+            🔒 Liquidaciones bloqueadas
+          </h2>
+
+          <p className="text-white/80 mb-4 max-w-md">
+            El módulo de liquidaciones automáticas está disponible a partir del
+            plan PRO.
+          </p>
+
+          <button
+            onClick={() => navigate("/planes")}
+            className="px-6 py-3 rounded-xl
+        bg-gradient-to-r from-indigo-500 to-purple-600
+        hover:opacity-90 transition
+        text-white font-semibold"
+          >
+            Ver planes
+          </button>
         </div>
       )}
-
-      {/* LISTADO MOBILE / GENERAL */}
-      {!loading && filteredItems.length > 0 && (
-        <LiquidacionesCards
-          items={filteredItems}
-          onVer={(id) => navigate(`/liquidaciones/${id}`)}
-          onExport={handleExport}
-          onDelete={handleDelete}
-        />
-      )}
-    </div>
-  </AppLayout>
-);
-
+    </AppLayout>
+  );
 }

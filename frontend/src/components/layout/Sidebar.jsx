@@ -11,7 +11,8 @@ import { useSuscripcion } from "../../hooks/useSuscripcion";
 import { canUseFeature } from "../../utils/permissions";
 
 export default function Sidebar({ mobile = false, onNavigate }) {
-  const { data: suscripcion } = useSuscripcion();
+ const { suscripcion } = useSuscripcion();
+
 
   const { user, logout } = useAuth();
 

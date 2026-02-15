@@ -1,4 +1,5 @@
 import { Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import AppLayout from "../components/layout/AppLayout";
 import MiUnidadLayout from "../components/propietario/MiUnidadLayout";
@@ -8,10 +9,23 @@ import MiUnidadAcciones from "../components/propietario/MiUnidadAcciones";
 import PageHeader from "../components/ui/PageHeader";
 
 import { useMiPropietario } from "../hooks/propietario/useMiPropietario";
+import { useAuth } from "../context/AuthContext";
+import { useSuscripcion } from "../hooks/useSuscripcion";
+import { canUseFeature } from "../utils/permissions";
 
 export default function MiUnidadPage() {
+  const navigate = useNavigate();
+
   const { data, loading, editarTelefono, solicitarCambioUnidad } =
     useMiPropietario();
+
+  const { user } = useAuth();
+  const { suscripcion } = useSuscripcion();
+
+  const canUseMiUnidad = canUseFeature(
+    { role: user?.role, suscripcion },
+    "MI_UNIDAD",
+  );
 
   if (loading) {
     return (
@@ -33,26 +47,63 @@ export default function MiUnidadPage() {
     );
   }
 
- return (
-  <AppLayout>
-    <MiUnidadLayout>
-      <PageHeader
-        title="Mi Unidad"
-        subtitle="Información del propietario y su unidad"
-        role="PROPIETARIO"
-      />
+  return (
+    <AppLayout>
+      <div className="relative">
+        {/* CONTENIDO NORMAL */}
+        <MiUnidadLayout>
+          <PageHeader
+            title="Mi Unidad"
+            subtitle="Información del propietario y su unidad"
+            role="PROPIETARIO"
+          />
 
-      <MiUnidadInfo data={data} />
+          <MiUnidadInfo data={data} />
 
-      <MiUnidadEstado montoPendiente={data.montoPendiente} />
+          <MiUnidadEstado montoPendiente={data.montoPendiente} />
 
-      <MiUnidadAcciones
-        onEditarTelefono={editarTelefono}
-        onSolicitarCambioUnidad={solicitarCambioUnidad}
-      />
-    </MiUnidadLayout>
-  </AppLayout>
-);
+          <MiUnidadAcciones
+            onEditarTelefono={editarTelefono}
+            onSolicitarCambioUnidad={solicitarCambioUnidad}
+          />
+        </MiUnidadLayout>
 
+        {/* 🔒 OVERLAY BLOQUEO PREMIUM */}
+        {!canUseMiUnidad && (
+          <div
+            className="
+              fixed inset-0 z-[9999]
+              bg-black/70 backdrop-blur-md
+              flex flex-col items-center justify-center
+              text-center px-6
+            "
+          >
+            <div className="max-w-md">
+              <h2 className="text-3xl font-bold text-white mb-3">
+                🔒 Mi unidad deshabilitada
+              </h2>
 
+              <p className="text-white/80 mb-6 leading-relaxed">
+                Este módulo se habilita al activar un plan. Mientras tanto, solo
+                podés acceder a <b>Inicio</b>.
+              </p>
+
+              <button
+                onClick={() => navigate("/planes")}
+                className="
+                  px-8 py-4 rounded-2xl
+                  bg-gradient-to-r from-indigo-500 to-purple-600
+                  hover:opacity-90 transition
+                  text-white font-semibold text-lg
+                  shadow-[0_0_40px_rgba(99,102,241,0.6)]
+                "
+              >
+                Ver planes
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </AppLayout>
+  );
 }

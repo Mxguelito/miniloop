@@ -19,10 +19,7 @@ export function useSuscripcion() {
         diasRestantes: res.data.dias_restantes ?? null,
 
         // ACTIVA → ACTIVO (clave para el banner)
-        estado:
-          res.data.estado === "ACTIVA"
-            ? "ACTIVO"
-            : res.data.estado ?? "SIN_SUSCRIPCION",
+        estado: res.data.estado ?? "SIN_SUSCRIPCION",
       });
     } catch (e) {
       console.error("Error cargando suscripción", e);
@@ -43,7 +40,7 @@ export function useSuscripcion() {
   }, [load]);
 
   return {
-    data,
+    suscripcion: data,
     loading,
     refresh: load,
   };

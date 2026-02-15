@@ -1,25 +1,21 @@
-
-
-
-
-
 -- =========================
 -- 001_init.sql
 -- Migración base MiniLoop
 -- =========================
 
-CREATE TABLE public.consorcios (
+CREATE TABLE IF NOT EXISTS public.consorcios (
     id INTEGER PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     direccion VARCHAR(200),
     creado_en TIMESTAMP DEFAULT now()
 );
 
-CREATE SEQUENCE public.consorcios_id_seq START 1;
-ALTER TABLE public.consorcios ALTER COLUMN id SET DEFAULT nextval('public.consorcios_id_seq');
+CREATE SEQUENCE IF NOT EXISTS public.consorcios_id_seq START 1;
+ALTER TABLE IF EXISTS public.consorcios 
+    ALTER COLUMN id SET DEFAULT nextval('public.consorcios_id_seq');
 
 
-CREATE TABLE public.usuarios (
+CREATE TABLE IF NOT EXISTS public.usuarios (
     id INTEGER PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -29,11 +25,12 @@ CREATE TABLE public.usuarios (
     creado_en TIMESTAMP DEFAULT now()
 );
 
-CREATE SEQUENCE public.usuarios_id_seq START 1;
-ALTER TABLE public.usuarios ALTER COLUMN id SET DEFAULT nextval('public.usuarios_id_seq');
+CREATE SEQUENCE IF NOT EXISTS public.usuarios_id_seq START 1;
+ALTER TABLE IF EXISTS public.usuarios 
+    ALTER COLUMN id SET DEFAULT nextval('public.usuarios_id_seq');
 
 
-CREATE TABLE public.propietarios (
+CREATE TABLE IF NOT EXISTS public.propietarios (
     id INTEGER PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100),
@@ -48,11 +45,12 @@ CREATE TABLE public.propietarios (
     creado_en TIMESTAMP DEFAULT now()
 );
 
-CREATE SEQUENCE public.propietarios_id_seq START 1;
-ALTER TABLE public.propietarios ALTER COLUMN id SET DEFAULT nextval('public.propietarios_id_seq');
+CREATE SEQUENCE IF NOT EXISTS public.propietarios_id_seq START 1;
+ALTER TABLE IF EXISTS public.propietarios 
+    ALTER COLUMN id SET DEFAULT nextval('public.propietarios_id_seq');
 
 
-CREATE TABLE public.inquilinos (
+CREATE TABLE IF NOT EXISTS public.inquilinos (
     id INTEGER PRIMARY KEY,
     usuario_id INTEGER,
     nombre VARCHAR(100),
@@ -63,11 +61,12 @@ CREATE TABLE public.inquilinos (
     created_at TIMESTAMP DEFAULT now()
 );
 
-CREATE SEQUENCE public.inquilinos_id_seq START 1;
-ALTER TABLE public.inquilinos ALTER COLUMN id SET DEFAULT nextval('public.inquilinos_id_seq');
+CREATE SEQUENCE IF NOT EXISTS public.inquilinos_id_seq START 1;
+ALTER TABLE IF EXISTS public.inquilinos 
+    ALTER COLUMN id SET DEFAULT nextval('public.inquilinos_id_seq');
 
 
-CREATE TABLE public.liquidaciones (
+CREATE TABLE IF NOT EXISTS public.liquidaciones (
     id INTEGER PRIMARY KEY,
     mes INTEGER NOT NULL,
     anio INTEGER NOT NULL,
@@ -82,11 +81,12 @@ CREATE TABLE public.liquidaciones (
     creado_en TIMESTAMP DEFAULT now()
 );
 
-CREATE SEQUENCE public.liquidaciones_id_seq START 1;
-ALTER TABLE public.liquidaciones ALTER COLUMN id SET DEFAULT nextval('public.liquidaciones_id_seq');
+CREATE SEQUENCE IF NOT EXISTS public.liquidaciones_id_seq START 1;
+ALTER TABLE IF EXISTS public.liquidaciones 
+    ALTER COLUMN id SET DEFAULT nextval('public.liquidaciones_id_seq');
 
 
-CREATE TABLE public.movimientos (
+CREATE TABLE IF NOT EXISTS public.movimientos (
     id INTEGER PRIMARY KEY,
     liquidacion_id INTEGER NOT NULL,
     tipo VARCHAR(20) NOT NULL,
@@ -94,11 +94,12 @@ CREATE TABLE public.movimientos (
     monto NUMERIC(12,2) NOT NULL
 );
 
-CREATE SEQUENCE public.movimientos_id_seq START 1;
-ALTER TABLE public.movimientos ALTER COLUMN id SET DEFAULT nextval('public.movimientos_id_seq');
+CREATE SEQUENCE IF NOT EXISTS public.movimientos_id_seq START 1;
+ALTER TABLE IF EXISTS public.movimientos 
+    ALTER COLUMN id SET DEFAULT nextval('public.movimientos_id_seq');
 
 
-CREATE TABLE public.saldos (
+CREATE TABLE IF NOT EXISTS public.saldos (
     id INTEGER PRIMARY KEY,
     propietario_id INTEGER NOT NULL,
     liquidacion_id INTEGER NOT NULL,
@@ -110,11 +111,12 @@ CREATE TABLE public.saldos (
     creado_en TIMESTAMP DEFAULT now()
 );
 
-CREATE SEQUENCE public.saldos_id_seq START 1;
-ALTER TABLE public.saldos ALTER COLUMN id SET DEFAULT nextval('public.saldos_id_seq');
+CREATE SEQUENCE IF NOT EXISTS public.saldos_id_seq START 1;
+ALTER TABLE IF EXISTS public.saldos 
+    ALTER COLUMN id SET DEFAULT nextval('public.saldos_id_seq');
 
 
-CREATE TABLE public.solicitudes_unidad (
+CREATE TABLE IF NOT EXISTS public.solicitudes_unidad (
     id INTEGER PRIMARY KEY,
     propietario_id INTEGER NOT NULL,
     piso VARCHAR(20),
@@ -124,11 +126,12 @@ CREATE TABLE public.solicitudes_unidad (
     creado_en TIMESTAMP DEFAULT now()
 );
 
-CREATE SEQUENCE public.solicitudes_unidad_id_seq START 1;
-ALTER TABLE public.solicitudes_unidad ALTER COLUMN id SET DEFAULT nextval('public.solicitudes_unidad_id_seq');
+CREATE SEQUENCE IF NOT EXISTS public.solicitudes_unidad_id_seq START 1;
+ALTER TABLE IF EXISTS public.solicitudes_unidad 
+    ALTER COLUMN id SET DEFAULT nextval('public.solicitudes_unidad_id_seq');
 
 
-CREATE TABLE public.kiosco_products (
+CREATE TABLE IF NOT EXISTS public.kiosco_products (
     id INTEGER PRIMARY KEY,
     name VARCHAR(120) NOT NULL,
     description TEXT,
@@ -141,11 +144,12 @@ CREATE TABLE public.kiosco_products (
     updated_at TIMESTAMP DEFAULT now()
 );
 
-CREATE SEQUENCE public.kiosco_products_id_seq START 1;
-ALTER TABLE public.kiosco_products ALTER COLUMN id SET DEFAULT nextval('public.kiosco_products_id_seq');
+CREATE SEQUENCE IF NOT EXISTS public.kiosco_products_id_seq START 1;
+ALTER TABLE IF EXISTS public.kiosco_products 
+    ALTER COLUMN id SET DEFAULT nextval('public.kiosco_products_id_seq');
 
 
-CREATE TABLE public.kiosco_orders (
+CREATE TABLE IF NOT EXISTS public.kiosco_orders (
     id INTEGER PRIMARY KEY,
     user_id INTEGER NOT NULL,
     status VARCHAR(20) DEFAULT 'PENDING' NOT NULL,
@@ -154,11 +158,12 @@ CREATE TABLE public.kiosco_orders (
     created_at TIMESTAMP DEFAULT now()
 );
 
-CREATE SEQUENCE public.kiosco_orders_id_seq START 1;
-ALTER TABLE public.kiosco_orders ALTER COLUMN id SET DEFAULT nextval('public.kiosco_orders_id_seq');
+CREATE SEQUENCE IF NOT EXISTS public.kiosco_orders_id_seq START 1;
+ALTER TABLE IF EXISTS public.kiosco_orders 
+    ALTER COLUMN id SET DEFAULT nextval('public.kiosco_orders_id_seq');
 
 
-CREATE TABLE public.kiosco_order_items (
+CREATE TABLE IF NOT EXISTS public.kiosco_order_items (
     id INTEGER PRIMARY KEY,
     order_id INTEGER NOT NULL,
     product_id INTEGER NOT NULL,
@@ -167,38 +172,88 @@ CREATE TABLE public.kiosco_order_items (
     subtotal INTEGER NOT NULL CHECK (subtotal >= 0)
 );
 
-CREATE SEQUENCE public.kiosco_order_items_id_seq START 1;
-ALTER TABLE public.kiosco_order_items ALTER COLUMN id SET DEFAULT nextval('public.kiosco_order_items_id_seq');
+CREATE SEQUENCE IF NOT EXISTS public.kiosco_order_items_id_seq START 1;
+ALTER TABLE IF EXISTS public.kiosco_order_items 
+    ALTER COLUMN id SET DEFAULT nextval('public.kiosco_order_items_id_seq');
 
 
--- FOREIGN KEYS
+-- FOREIGN KEYS (blindadas)
+
+ALTER TABLE IF EXISTS public.propietarios
+    DROP CONSTRAINT IF EXISTS fk_propietarios_usuario;
 
 ALTER TABLE public.propietarios
-    ADD CONSTRAINT fk_propietarios_usuario FOREIGN KEY (usuario_id) REFERENCES public.usuarios(id);
+    ADD CONSTRAINT fk_propietarios_usuario 
+    FOREIGN KEY (usuario_id) REFERENCES public.usuarios(id);
+
+
+ALTER TABLE IF EXISTS public.propietarios
+    DROP CONSTRAINT IF EXISTS fk_propietarios_consorcio;
 
 ALTER TABLE public.propietarios
-    ADD CONSTRAINT fk_propietarios_consorcio FOREIGN KEY (consorcio_id) REFERENCES public.consorcios(id);
+    ADD CONSTRAINT fk_propietarios_consorcio 
+    FOREIGN KEY (consorcio_id) REFERENCES public.consorcios(id);
+
+
+ALTER TABLE IF EXISTS public.inquilinos
+    DROP CONSTRAINT IF EXISTS fk_inquilinos_usuario;
 
 ALTER TABLE public.inquilinos
-    ADD CONSTRAINT fk_inquilinos_usuario FOREIGN KEY (usuario_id) REFERENCES public.usuarios(id);
+    ADD CONSTRAINT fk_inquilinos_usuario 
+    FOREIGN KEY (usuario_id) REFERENCES public.usuarios(id);
+
+
+ALTER TABLE IF EXISTS public.liquidaciones
+    DROP CONSTRAINT IF EXISTS fk_liquidaciones_consorcio;
 
 ALTER TABLE public.liquidaciones
-    ADD CONSTRAINT fk_liquidaciones_consorcio FOREIGN KEY (consorcio_id) REFERENCES public.consorcios(id) ON DELETE SET NULL;
+    ADD CONSTRAINT fk_liquidaciones_consorcio 
+    FOREIGN KEY (consorcio_id) REFERENCES public.consorcios(id) ON DELETE SET NULL;
+
+
+ALTER TABLE IF EXISTS public.movimientos
+    DROP CONSTRAINT IF EXISTS fk_movimientos_liquidacion;
 
 ALTER TABLE public.movimientos
-    ADD CONSTRAINT fk_movimientos_liquidacion FOREIGN KEY (liquidacion_id) REFERENCES public.liquidaciones(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_movimientos_liquidacion 
+    FOREIGN KEY (liquidacion_id) REFERENCES public.liquidaciones(id) ON DELETE CASCADE;
+
+
+ALTER TABLE IF EXISTS public.saldos
+    DROP CONSTRAINT IF EXISTS fk_saldos_propietario;
 
 ALTER TABLE public.saldos
-    ADD CONSTRAINT fk_saldos_propietario FOREIGN KEY (propietario_id) REFERENCES public.propietarios(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_saldos_propietario 
+    FOREIGN KEY (propietario_id) REFERENCES public.propietarios(id) ON DELETE CASCADE;
+
+
+ALTER TABLE IF EXISTS public.saldos
+    DROP CONSTRAINT IF EXISTS fk_saldos_liquidacion;
 
 ALTER TABLE public.saldos
-    ADD CONSTRAINT fk_saldos_liquidacion FOREIGN KEY (liquidacion_id) REFERENCES public.liquidaciones(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_saldos_liquidacion 
+    FOREIGN KEY (liquidacion_id) REFERENCES public.liquidaciones(id) ON DELETE CASCADE;
+
+
+ALTER TABLE IF EXISTS public.solicitudes_unidad
+    DROP CONSTRAINT IF EXISTS fk_solicitudes_propietario;
 
 ALTER TABLE public.solicitudes_unidad
-    ADD CONSTRAINT fk_solicitudes_propietario FOREIGN KEY (propietario_id) REFERENCES public.propietarios(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_solicitudes_propietario 
+    FOREIGN KEY (propietario_id) REFERENCES public.propietarios(id) ON DELETE CASCADE;
+
+
+ALTER TABLE IF EXISTS public.kiosco_order_items
+    DROP CONSTRAINT IF EXISTS fk_items_order;
 
 ALTER TABLE public.kiosco_order_items
-    ADD CONSTRAINT fk_items_order FOREIGN KEY (order_id) REFERENCES public.kiosco_orders(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_items_order 
+    FOREIGN KEY (order_id) REFERENCES public.kiosco_orders(id) ON DELETE CASCADE;
+
+
+ALTER TABLE IF EXISTS public.kiosco_order_items
+    DROP CONSTRAINT IF EXISTS fk_items_product;
 
 ALTER TABLE public.kiosco_order_items
-    ADD CONSTRAINT fk_items_product FOREIGN KEY (product_id) REFERENCES public.kiosco_products(id);
+    ADD CONSTRAINT fk_items_product 
+    FOREIGN KEY (product_id) REFERENCES public.kiosco_products(id);

@@ -29,7 +29,9 @@ export default function AccionesRapidas() {
       label: "Ver liquidaciones",
       icon: FileText,
       color: "from-purple-500 to-indigo-600",
-      requires: "VIEW_INFO", // 👈 AHORA SE CONTROLA
+      requires: "MIS_LIQUIDACIONES",
+
+ // 👈 AHORA SE CONTROLA
       onClick: () => navigate("/propietario/liquidaciones"),
     },
     {
